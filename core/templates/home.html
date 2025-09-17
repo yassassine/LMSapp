@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Accueil - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<!-- Section Hero -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">Bienvenue à la Garderie Scolaire</h1>
+                <p class="lead mb-4">Un lieu d'apprentissage, de jeu et d'épanouissement pour vos enfants</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'enroll_form' %}" class="btn btn-light btn-lg px-4 py-3">
+                        <i class="fas fa-user-plus me-2"></i>Inscrire mon enfant
+                    </a>
+                    <a href="{% url 'activities' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="fas fa-calendar-alt me-2"></i>Voir les activités
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img src="{% static 'images/hero-children.png' %}" class="img-fluid rounded-3 shadow-lg" alt="Enfants heureux">
+                    <div class="position-absolute top-0 start-0 bg-warning text-dark p-2 rounded-end">
+                        <i class="fas fa-star me-1"></i>Ouvert de 7h30 à 18h30
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Actualités -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-newspaper me-2 text-primary"></i>Dernières Actualités</h2>
+                <p class="text-muted">Restez informés des dernières nouvelles de notre garderie</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for news in latest_news %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="position-relative">
+                        <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}">
+                        <div class="position-absolute top-0 end-0 bg-primary text-white p-2">
+                            {{ news.date|date:"d M" }}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-info mb-2">{{ news.category }}</span>
+                        <h3 class="card-title h5">{{ news.title }}</h3>
+                        <p class="card-text">{{ news.summary|truncatechars:120 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="{% url 'news_detail' news.id %}" class="btn btn-sm btn-outline-primary">
+                            Lire la suite <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                <h3>Aucune actualité pour le moment</h3>
+                <p class="text-muted">Revenez bientôt pour découvrir nos dernières nouvelles</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'news_list' %}" class="btn btn-primary">
+                <i class="fas fa-book-open me-1"></i>Voir toutes les actualités
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Section Événements à venir -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-calendar-check me-2 text-success"></i>Événements à Venir</h2>
+                <p class="text-muted">Découvrez nos prochaines activités et événements spéciaux</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="timeline">
+                    {% for event in upcoming_events %}
+                    <div class="timeline-item">
+                        <div class="timeline-date bg-primary text-white">
+                            <span class="day">{{ event.date|date:"d" }}</span>
+                            <span class="month">{{ event.date|date:"M" }}</span>
+                        </div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h3 class="h5 mb-0">{{ event.title }}</h3>
+                                    <span class="badge bg-{{ event.get_type_color }}">{{ event.get_type_display }}</span>
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-clock me-1"></i> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
+                                </p>
+                                <p class="mb-0">{{ event.description|truncatechars:100 }}</p>
+                            </div>
+                            <div class="card-footer bg-light d-flex justify-content-between">
+                                <span>
+                                    <i class="fas fa-map-marker-alt me-1"></i> {{ event.location }}
+                                </span>
+                                <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-secondary">
+                                    Détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h3>Aucun événement prévu</h3>
+                        <p class="text-muted">Consultez régulièrement notre calendrier pour les prochains événements</p>
+                        <a href="{% url 'calendar_view' %}" class="btn btn-outline-success">
+                            <i class="fas fa-calendar-alt me-1"></i>Voir le calendrier
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'events_list' %}" class="btn btn-success">
+                <i class="fas fa-list me-1"></i>Voir tous les événements
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Section Témoignages -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-comments me-2 text-warning"></i>Ce que disent les parents</h2>
+                <p class="text-muted">Découvrez les témoignages de nos familles satisfaites</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 mx-auto">
+                <div class="owl-carousel testimonial-carousel">
+                    {% for testimonial in testimonials %}
+                    <div class="testimonial-item p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ testimonial.parent.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                                 class="rounded-circle me-3" 
+                                 width="60" 
+                                 height="60"
+                                 alt="{{ testimonial.parent.get_full_name }}">
+                            <div>
+                                <h5 class="mb-0">{{ testimonial.parent.get_full_name }}</h5>
+                                <p class="text-muted mb-0">Parent de {{ testimonial.child_name }}</p>
+                            </div>
+                        </div>
+                        <div class="testimonial-content">
+                            <div class="rating mb-3">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= testimonial.rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <blockquote class="mb-0">
+                                "{{ testimonial.content }}"
+                            </blockquote>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                        <h3>Aucun témoignage pour le moment</h3>
+                        <p class="text-muted">Soyez le premier à partager votre expérience!</p>
+                        <a href="{% url 'add_testimonial' %}" class="btn btn-warning">
+                            <i class="fas fa-plus me-1"></i>Ajouter un témoignage
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Newsletter -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <h2 class="h1 mb-3">Restez informé</h2>
+                <p class="mb-0">Recevez nos actualités et événements directement par email</p>
+            </div>
+            <div class="col-lg-7">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-0">
+                                <i class="fas fa-envelope text-primary"></i>
+                            </span>
+                            <input type="email" 
+                                   name="email" 
+                                   class="form-control form-control-lg border-0" 
+                                   placeholder="Votre adresse email" 
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-light btn-lg w-100">
+                            S'inscrire
+                        </button>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consent" required>
+                            <label class="form-check-label small" for="consent">
+                                J'accepte de recevoir les communications de la Garderie Scolaire
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Contact rapide -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-primary text-white mb-4 mx-auto">
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                        </div>
+                        <h3 class="h5">Nous trouver</h3>
+                        <p class="mb-0">123 Avenue des Écoles<br>75001 Paris</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-success text-white mb-4 mx-auto">
+                            <i class="fas fa-phone-alt fa-2x"></i>
+                        </div>
+                        <h3 class="h5">Nous appeler</h3>
+                        <p class="mb-0">01 23 45 67 89<br>Lun-Ven: 8h-18h</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-info text-white mb-4 mx-auto">
+                            <i class="fas fa-envelope fa-2x"></i>
+                        </div>
+                        <h3 class="h5">Nous écrire</h3>
+                        <p class="mb-0">contact@garderie-scolaire.fr<br>Réponse sous 24h</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 3rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1.5rem;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #0d6efd;
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2.5rem;
+    }
+    
+    .timeline-date {
+        position: absolute;
+        left: -3.5rem;
+        top: 0;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+    
+    .timeline-date .day {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+    
+    .timeline-date .month {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .timeline-content {
+        background: white;
+        border-radius: 0.5rem;
+    }
+    
+    .testimonial-item {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+    }
+    
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .owl-carousel .owl-item img {
+        width: auto;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Initialisation du carrousel de témoignages -->
+<script>
+$(document).ready(function(){
+    $('.testimonial-carousel').owlCarousel({
+        loop: true,
+        margin: 20,
+        nav: true,
+        dots: false,
+        responsive: {
+            0: {
+                items: 1
+            },
+            768: {
+                items: 2
+            },
+            992: {
+                items: 3
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

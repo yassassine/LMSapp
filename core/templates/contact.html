@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<!-- Section Hero -->
+<section class="contact-hero bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">Contactez-nous</h1>
+                <p class="lead mb-4">Une question, une demande de renseignement ou une pré-inscription ? Notre équipe est à votre écoute.</p>
+                
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#contact-form" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-paper-plane me-2"></i>Envoyer un message
+                    </a>
+                    <a href="{% url 'enroll_form' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>Pré-inscription
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-white text-dark shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="flex-shrink-0 bg-primary text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                            <div>
+                                <h3 class="h5 mb-0">Horaires d'ouverture</h3>
+                                <p class="mb-0">Lundi - Vendredi : 7h30 - 18h30</p>
+                                <p class="mb-0">Samedi : 9h00 - 12h00 (sur rendez-vous)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="flex-shrink-0 bg-success text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-phone-alt fa-2x"></i>
+                            </div>
+                            <div>
+                                <h3 class="h5 mb-0">Téléphone</h3>
+                                <p class="mb-0">01 23 45 67 89</p>
+                                <p class="mb-0">Urgences : 06 12 34 56 78</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 bg-info text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-envelope fa-2x"></i>
+                            </div>
+                            <div>
+                                <h3 class="h5 mb-0">Email</h3>
+                                <p class="mb-0">contact@garderie-scolaire.fr</p>
+                                <p class="mb-0">inscriptions@garderie-scolaire.fr</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Formulaire de Contact -->
+<section id="contact-form" class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-envelope me-2 text-primary"></i>Envoyez-nous un message</h2>
+                <p class="text-muted">Nous vous répondrons dans les plus brefs délais</p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="id_name" class="form-label">Votre nom complet <span class="text-danger">*</span></label>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           id="id_name" 
+                                           name="name"
+                                           required
+                                           placeholder="Ex: Marie Dupont">
+                                    <div class="invalid-feedback">
+                                        Veuillez saisir votre nom.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="id_email" class="form-label">Votre adresse email <span class="text-danger">*</span></label>
+                                    <input type="email" 
+                                           class="form-control form-control-lg" 
+                                           id="id_email" 
+                                           name="email"
+                                           required
+                                           placeholder="Ex: marie.dupont@exemple.fr">
+                                    <div class="invalid-feedback">
+                                        Veuillez saisir une adresse email valide.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="id_phone" class="form-label">Numéro de téléphone</label>
+                                    <input type="tel" 
+                                           class="form-control form-control-lg" 
+                                           id="id_phone" 
+                                           name="phone"
+                                           placeholder="Ex: 06 12 34 56 78">
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="id_subject" class="form-label">Sujet <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-lg" id="id_subject" name="subject" required>
+                                        <option value="" selected disabled>Sélectionnez un sujet...</option>
+                                        <option value="general">Demande générale</option>
+                                        <option value="enrollment">Inscription</option>
+                                        <option value="schedule">Horaires et disponibilités</option>
+                                        <option value="activities">Activités et programmes</option>
+                                        <option value="billing">Facturation et paiement</option>
+                                        <option value="other">Autre demande</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Veuillez sélectionner un sujet.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="id_message" class="form-label">Votre message <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-lg" 
+                                          id="id_message" 
+                                          name="message" 
+                                          rows="5" 
+                                          required
+                                          placeholder="Décrivez votre demande en détail..."></textarea>
+                                <div class="invalid-feedback">
+                                    Veuillez saisir votre message.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="id_consent" 
+                                           required>
+                                    <label class="form-check-label small" for="id_consent">
+                                        J'accepte que mes informations soient utilisées pour traiter ma demande et je confirme avoir pris connaissance de la 
+                                        <a href="{% url 'privacy_policy' %}" class="text-decoration-none">politique de confidentialité</a>.
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        Vous devez accepter les conditions.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Envoyer le message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Carte & Adresse -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Notre adresse</h3>
+                    </div>
+                    <div class="card-body">
+                        <address class="mb-0">
+                            <p class="fs-5 mb-1"><strong>Garderie Scolaire</strong></p>
+                            <p class="mb-1">123 Avenue des Écoles</p>
+                            <p class="mb-1">75001 Paris, France</p>
+                            <p class="mb-0 mt-3">
+                                <i class="fas fa-subway me-2 text-primary"></i>
+                                Métro : Ligne 4 (Station Écoles) - Ligne 10 (Station Sorbonne)
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-bus me-2 text-success"></i>
+                                Bus : 38, 63, 86, 87 (Arrêt Garderie)
+                            </p>
+                        </address>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Localisation</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="ratio ratio-16x9">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.991625693759!2d2.292292676240018!3d48.858370100709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1620000000000!5m2!1sfr!2sfr" 
+                                class="embed-responsive-item" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Équipe Contact -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-users me-2 text-primary"></i>Notre Équipe à Votre Écoute</h2>
+                <p class="text-muted">Les personnes qui vous accompagneront dans votre démarche</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/team/directrice.jpg' %}" 
+                             class="rounded-circle mb-3" 
+                             width="120" 
+                             height="120"
+                             alt="Directrice de la garderie">
+                        <h3 class="h5 mb-1">Sophie Martin</h3>
+                        <p class="text-muted mb-3">Directrice</p>
+                        
+                        <p class="mb-3">Responsable de la structure et des inscriptions</p>
+                        
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="mailto:s.martin@garderie-scolaire.fr" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Email
+                            </a>
+                            <a href="tel:+33123456789" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-phone-alt me-1"></i>Appeler
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/team/pedagogue.jpg' %}" 
+                             class="rounded-circle mb-3" 
+                             width="120" 
+                             height="120"
+                             alt="Responsable pédagogique">
+                        <h3 class="h5 mb-1">Thomas Leroy</h3>
+                        <p class="text-muted mb-3">Responsable Pédagogique</p>
+                        
+                        <p class="mb-3">Questions sur les activités et programmes éducatifs</p>
+                        
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="mailto:t.leroy@garderie-scolaire.fr" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Email
+                            </a>
+                            <a href="tel:+33123456790" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-phone-alt me-1"></i>Appeler
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card team-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/team/administration.jpg' %}" 
+                             class="rounded-circle mb-3" 
+                             width="120" 
+                             height="120"
+                             alt="Responsable administrative">
+                        <h3 class="h5 mb-1">Émilie Dubois</h3>
+                        <p class="text-muted mb-3">Administration & Facturation</p>
+                        
+                        <p class="mb-3">Gestion des inscriptions et aspects financiers</p>
+                        
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="mailto:e.dubois@garderie-scolaire.fr" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Email
+                            </a>
+                            <a href="tel:+33123456791" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-phone-alt me-1"></i>Appeler
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section FAQ Contact -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-question-circle me-2 text-info"></i>Questions Fréquentes</h2>
+                <p class="text-muted">Trouvez rapidement des réponses à vos interrogations</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="accordion" id="contactFAQ">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Quels sont les horaires de visite de la garderie ?
+                            </button>
+                        </h3>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                <p>Nous proposons des visites sur rendez-vous :</p>
+                                <ul>
+                                    <li><strong>Lundi au vendredi :</strong> 9h30 - 11h30 et 14h30 - 16h30</li>
+                                    <li><strong>Samedi :</strong> 9h00 - 12h00 (un samedi par mois)</li>
+                                </ul>
+                                <p class="mb-0">Pour planifier une visite, utilisez notre <a href="#contact-form">formulaire de contact</a> ou appelez-nous au 01 23 45 67 89.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Quel est le délai moyen de réponse à un message ?
+                            </button>
+                        </h3>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                <p>Nous nous engageons à répondre à toutes les demandes dans un délai maximum de 48 heures ouvrées :</p>
+                                <ul>
+                                    <li>Demandes générales : 24-48 heures</li>
+                                    <li>Demandes d'inscription : 24 heures</li>
+                                    <li>Demandes urgentes : dans la journée</li>
+                                </ul>
+                                <p class="mb-0">Pour les urgences, privilégiez un appel téléphonique au 06 12 34 56 78.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Quels documents sont nécessaires pour une pré-inscription ?
+                            </button>
+                        </h3>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                <p>Pour une pré-inscription, vous aurez besoin de :</p>
+                                <ol>
+                                    <li>Fiche de pré-inscription remplie (disponible en ligne)</li>
+                                    <li>Copie du carnet de vaccination de l'enfant</li>
+                                    <li>Copie des pièces d'identité des parents</li>
+                                    <li>Justificatif de domicile récent</li>
+                                    <li>Attestation d'assurance responsabilité civile</li>
+                                </ol>
+                                <p class="mb-0">Notre équipe vous fournira tous les détails après votre demande initiale.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Proposez-vous des solutions d'urgence pour garde d'enfants ?
+                            </button>
+                        </h3>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                <p>Oui, nous proposons un service de garde d'urgence dans la limite des places disponibles :</p>
+                                <ul>
+                                    <li>Disponible du lundi au vendredi</li>
+                                    <li>Sur présentation d'un justificatif (convocation, certificat médical, etc.)</li>
+                                    <li>Réservation par téléphone uniquement (01 23 45 67 89)</li>
+                                    <li>Tarif spécial pour les situations d'urgence</li>
+                                </ul>
+                                <p class="mb-0">Ce service est soumis à disponibilité, contactez-nous dès que possible.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a href="{% url 'faq' %}" class="btn btn-lg btn-outline-primary">
+                        <i class="fas fa-book me-2"></i>Voir toutes les questions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-hero {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .team-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0d6efd;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+    
+    .contact-form .form-control,
+    .contact-form .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validation Bootstrap
+(() => {
+  'use strict'
+  
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+  
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}

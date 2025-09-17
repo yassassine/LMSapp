@@ -1,0 +1,608 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}À propos - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<!-- Section Hero À propos -->
+<section class="about-hero bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">Notre Garderie Scolaire</h1>
+                <p class="lead text-muted mb-4">Un lieu d'épanouissement où chaque enfant grandit avec confiance et curiosité</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'schedule' %}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-calendar-alt me-2"></i>Voir nos horaires
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-primary btn-lg px-4">
+                        <i class="fas fa-envelope me-2"></i>Nous contacter
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9">
+                    <img src="{% static 'images/about-hero.jpg' %}" class="img-fluid rounded-3 shadow" alt="Enfants dans notre garderie">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Notre Histoire -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-history me-2 text-primary"></i>Notre Histoire</h2>
+                <p class="text-muted">Découvrez le parcours qui a façonné notre établissement</p>
+            </div>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="timeline-vertical">
+                    <div class="timeline-item">
+                        <div class="timeline-year bg-primary text-white">2005</div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <h3 class="h5">Fondation de la Garderie</h3>
+                                <p>Ouverture de notre premier établissement avec seulement 2 classes et 3 enseignants passionnés.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year bg-success text-white">2010</div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <h3 class="h5">Agrandissement des locaux</h3>
+                                <p>Doublement de notre surface pour accueillir plus d'enfants et créer de nouveaux espaces éducatifs.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year bg-warning text-dark">2018</div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <h3 class="h5">Certification Éco-École</h3>
+                                <p>Obtention de la certification pour notre engagement en faveur du développement durable.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year bg-info text-white">2023</div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <h3 class="h5">Lancement de la plateforme numérique</h3>
+                                <p>Mise en place de notre système LMS pour un apprentissage connecté et moderne.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h3 class="h4 mb-4">Notre mission éducative</h3>
+                        <p class="mb-4">Depuis plus de 15 ans, notre garderie s'engage à offrir un environnement sécurisé et stimulant où chaque enfant peut développer sa créativité, son autonomie et sa confiance en soi.</p>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0 text-primary me-3">
+                                <i class="fas fa-leaf fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Approche écologique</h4>
+                                <p class="mb-0">Nous intégrons l'éducation à l'environnement dans toutes nos activités quotidiennes.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0 text-success me-3">
+                                <i class="fas fa-hands-helping fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Pédagogie active</h4>
+                                <p class="mb-0">Les enfants apprennent par l'expérimentation et la collaboration.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 text-info me-3">
+                                <i class="fas fa-heart fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Bien-être émotionnel</h4>
+                                <p class="mb-0">Un accompagnement personnalisé pour développer l'intelligence émotionnelle.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Galerie -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-images me-2 text-primary"></i>Galerie de Notre Garderie</h2>
+                <p class="text-muted">Explorez nos espaces et découvrez la vie quotidienne dans notre établissement</p>
+            </div>
+        </div>
+        
+        <!-- Filtres de galerie -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex flex-wrap justify-content-center gallery-filters">
+                    <button class="btn btn-outline-primary active mx-1 mb-2" data-filter="all">Tout voir</button>
+                    <button class="btn btn-outline-primary mx-1 mb-2" data-filter="classrooms">Salles de classe</button>
+                    <button class="btn btn-outline-primary mx-1 mb-2" data-filter="playground">Aires de jeux</button>
+                    <button class="btn btn-outline-primary mx-1 mb-2" data-filter="activities">Activités</button>
+                    <button class="btn btn-outline-primary mx-1 mb-2" data-filter="events">Événements</button>
+                    <button class="btn btn-outline-primary mx-1 mb-2" data-filter="garden">Jardin pédagogique</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grille de galerie -->
+        <div class="row gallery-grid">
+            <!-- Salles de classe -->
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="classrooms">
+                <a href="{% static 'images/gallery/classroom1.jpg' %}" data-lightbox="gallery" data-title="Notre salle de classe Montessori">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/classroom1-thumb.jpg' %}" class="card-img-top" alt="Salle de classe Montessori">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Espace Montessori</h5>
+                            <p class="card-text small text-muted">Apprentissage autonome</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="classrooms">
+                <a href="{% static 'images/gallery/classroom2.jpg' %}" data-lightbox="gallery" data-title="Atelier créatif">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/classroom2-thumb.jpg' %}" class="card-img-top" alt="Atelier créatif">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Atelier Créatif</h5>
+                            <p class="card-text small text-muted">Expression artistique</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Aires de jeux -->
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="playground">
+                <a href="{% static 'images/gallery/playground1.jpg' %}" data-lightbox="gallery" data-title="Aire de jeux extérieure">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/playground1-thumb.jpg' %}" class="card-img-top" alt="Aire de jeux extérieure">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Parc de Jeux</h5>
+                            <p class="card-text small text-muted">Développement moteur</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Activités -->
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="activities">
+                <a href="{% static 'images/gallery/activity1.jpg' %}" data-lightbox="gallery" data-title="Atelier jardinage">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/activity1-thumb.jpg' %}" class="card-img-top" alt="Atelier jardinage">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Atelier Jardinage</h5>
+                            <p class="card-text small text-muted">Découverte de la nature</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="activities">
+                <a href="{% static 'images/gallery/activity2.jpg' %}" data-lightbox="gallery" data-title="Cuisine pédagogique">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/activity2-thumb.jpg' %}" class="card-img-top" alt="Cuisine pédagogique">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Cuisine Pédagogique</h5>
+                            <p class="card-text small text-muted">Apprentissage par la pratique</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Événements -->
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="events">
+                <a href="{% static 'images/gallery/event1.jpg' %}" data-lightbox="gallery" data-title="Fête de fin d'année">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/event1-thumb.jpg' %}" class="card-img-top" alt="Fête de fin d'année">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Spectacle Annuel</h5>
+                            <p class="card-text small text-muted">Créativité en scène</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Jardin pédagogique -->
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="garden">
+                <a href="{% static 'images/gallery/garden1.jpg' %}" data-lightbox="gallery" data-title="Jardin pédagogique">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/garden1-thumb.jpg' %}" class="card-img-top" alt="Jardin pédagogique">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Jardin Potager</h5>
+                            <p class="card-text small text-muted">Apprentissage écologique</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="garden">
+                <a href="{% static 'images/gallery/garden2.jpg' %}" data-lightbox="gallery" data-title="Serre éducative">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/garden2-thumb.jpg' %}" class="card-img-top" alt="Serre éducative">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Serre Éducative</h5>
+                            <p class="card-text small text-muted">Découverte des plantes</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-4 col-sm-6 mb-4 gallery-item" data-category="activities">
+                <a href="{% static 'images/gallery/activity3.jpg' %}" data-lightbox="gallery" data-title="Atelier musique">
+                    <div class="gallery-card card border-0 shadow-sm h-100">
+                        <img src="{% static 'images/gallery/activity3-thumb.jpg' %}" class="card-img-top" alt="Atelier musique">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">Éveil Musical</h5>
+                            <p class="card-text small text-muted">Développement sensoriel</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'gallery' %}" class="btn btn-primary">
+                <i class="fas fa-images me-1"></i>Voir toute la galerie
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Section Notre Équipe -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-users me-2 text-primary"></i>Notre Équipe Pédagogique</h2>
+                <p class="text-muted">Des professionnels passionnés et qualifiés</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for member in team_members %}
+            <div class="col-md-4 mb-4">
+                <div class="card team-card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="{{ member.photo.url }}" class="card-img-top" alt="{{ member.name }}">
+                        <div class="position-absolute bottom-0 start-0 bg-primary text-white p-2 w-100">
+                            <h5 class="mb-0">{{ member.name }}</h5>
+                            <p class="mb-0 small">{{ member.position }}</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ member.bio|truncatechars:120 }}</p>
+                        <ul class="list-inline mb-0">
+                            {% if member.specialty %}
+                            <li class="list-inline-item">
+                                <span class="badge bg-info">{{ member.specialty }}</span>
+                            </li>
+                            {% endif %}
+                            {% if member.experience %}
+                            <li class="list-inline-item">
+                                <span class="badge bg-warning">{{ member.experience }} ans d'expérience</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="{% url 'team_detail' member.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-user-circle me-1"></i>Voir le profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+                <h3>Aucun membre d'équipe à afficher</h3>
+                <p class="text-muted">Notre équipe sera bientôt présentée ici</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Section Notre Approche -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-seedling me-2 text-success"></i>Notre Approche Éducative</h2>
+                <p class="text-muted">Une pédagogie innovante centrée sur l'enfant</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="h4 mb-0"><i class="fas fa-child me-2 text-primary"></i>Philosophie Montessori</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Nous intégrons les principes Montessori pour favoriser l'autonomie et l'apprentissage auto-dirigé :</p>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Environnement préparé adapté aux enfants</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Matériel sensoriel de qualité</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Liberté de choix dans les activités</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Apprentissage par l'expérience concrète</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="h4 mb-0"><i class="fas fa-globe-europe me-2 text-info"></i>Éducation à l'Environnement</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Notre engagement écologique se traduit par :</p>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-leaf text-success"></i></span>Jardin pédagogique et potager bio</li>
+                            <li><span class="fa-li"><i class="fas fa-leaf text-success"></i></span>Tri des déchets et compostage</li>
+                            <li><span class="fa-li"><i class="fas fa-leaf text-success"></i></span>Ateliers de sensibilisation à la biodiversité</li>
+                            <li><span class="fa-li"><i class="fas fa-leaf text-success"></i></span>Utilisation de matériaux naturels et recyclés</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="h4 mb-0"><i class="fas fa-brain me-2 text-warning"></i>Développement des Compétences</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Nous cultivons les compétences essentielles du 21e siècle :</p>
+                        <div class="row text-center">
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-info bg-opacity-10 rounded">
+                                    <i class="fas fa-comments fa-2x text-info mb-2"></i>
+                                    <p class="mb-0 small">Communication</p>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-primary bg-opacity-10 rounded">
+                                    <i class="fas fa-lightbulb fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 small">Créativité</p>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-success bg-opacity-10 rounded">
+                                    <i class="fas fa-puzzle-piece fa-2x text-success mb-2"></i>
+                                    <p class="mb-0 small">Résolution</p>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-warning bg-opacity-10 rounded">
+                                    <i class="fas fa-handshake fa-2x text-warning mb-2"></i>
+                                    <p class="mb-0 small">Collaboration</p>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-danger bg-opacity-10 rounded">
+                                    <i class="fas fa-brain fa-2x text-danger mb-2"></i>
+                                    <p class="mb-0 small">Pensée critique</p>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="p-3 bg-purple bg-opacity-10 rounded">
+                                    <i class="fas fa-heart fa-2x text-purple mb-2"></i>
+                                    <p class="mb-0 small">Empathie</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h3 class="h4 mb-0"><i class="fas fa-laptop-code me-2 text-secondary"></i>Intégration Numérique</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Une approche équilibrée du numérique :</p>
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0 text-primary me-3">
+                                <i class="fas fa-tablet-alt fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Tablettes éducatives</h4>
+                                <p class="mb-0">Utilisation encadrée d'applications pédagogiques</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0 text-success me-3">
+                                <i class="fas fa-robot fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Robotique éducative</h4>
+                                <p class="mb-0">Initiation à la programmation avec des robots adaptés</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 text-info me-3">
+                                <i class="fas fa-vr-cardboard fa-2x"></i>
+                            </div>
+                            <div>
+                                <h4 class="h5">Réalité virtuelle</h4>
+                                <p class="mb-0">Explorations immersives en groupe</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Contact -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <h2 class="h1 mb-3">Visitez Notre Garderie</h2>
+                <p class="mb-0">Nous organisons des portes ouvertes chaque mois pour découvrir nos espaces et rencontrer notre équipe.</p>
+            </div>
+            <div class="col-lg-7">
+                <div class="card bg-white text-dark shadow-lg">
+                    <div class="card-body p-4">
+                        <h3 class="h4 mb-4">Prochaine Journée Portes Ouvertes</h3>
+                        <div class="d-flex mb-4">
+                            <div class="date-box bg-primary text-white text-center p-3 me-4">
+                                <div class="day display-5 fw-bold">15</div>
+                                <div class="month text-uppercase">Sept</div>
+                                <div class="year">2023</div>
+                            </div>
+                            <div>
+                                <p class="mb-1"><i class="fas fa-clock me-2 text-primary"></i>10h00 - 16h00</p>
+                                <p class="mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i>123 Avenue des Écoles, Paris</p>
+                                <p class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>Visite guidée toutes les heures</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'register_visit' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-calendar-check me-2"></i>Réserver ma visite
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: url('{% static "images/about-bg-pattern.png" %}') no-repeat center center;
+        background-size: cover;
+    }
+    
+    .timeline-vertical {
+        position: relative;
+        padding-left: 40px;
+    }
+    
+    .timeline-vertical::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #0d6efd;
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .timeline-year {
+        position: absolute;
+        left: -40px;
+        top: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        font-weight: bold;
+    }
+    
+    .gallery-filters .btn.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .gallery-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .team-card img {
+        height: 300px;
+        object-fit: cover;
+    }
+    
+    .date-box {
+        border-radius: 10px;
+        min-width: 80px;
+    }
+    
+    .bg-purple {
+        background-color: #6f42c1;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lightbox pour la galerie -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+<!-- Filtrage de la galerie -->
+<script>
+$(document).ready(function(){
+    // Filtrage des éléments de galerie
+    $('.gallery-filters button').click(function(){
+        // Retirer la classe active de tous les boutons
+        $('.gallery-filters button').removeClass('active');
+        // Ajouter la classe active au bouton cliqué
+        $(this).addClass('active');
+        
+        const filter = $(this).data('filter');
+        
+        if(filter === 'all') {
+            $('.gallery-item').show();
+        } else {
+            $('.gallery-item').hide();
+            $(`.gallery-item[data-category="${filter}"]`).show();
+        }
+    });
+    
+    // Configuration de Lightbox
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'albumLabel': 'Image %1 sur %2'
+    });
+});
+</script>
+{% endblock %}

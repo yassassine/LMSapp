@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Progrès - Garderie Scolaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --math-color: #ff6b6b;
+            --language-color: #1dd1a1;
+            --art-color: #ff9ff3;
+            --science-color: #54a0ff;
+            --music-color: #feca57;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-card {
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            background: white;
+        }
+        
+        .progress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .child-card {
+            text-align: center;
+            padding: 25px 15px;
+        }
+        
+        .child-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 0 auto 15px;
+        }
+        
+        .progress-summary {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 15px 0;
+            background: rgba(76, 201, 240, 0.1);
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .summary-item {
+            padding: 10px;
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .summary-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .badge-custom {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .progress-chart-container {
+            height: 300px;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .milestone-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+        
+        .activity-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-row:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            color: white;
+        }
+        
+        .progress-bar-custom {
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            overflow: hidden;
+            flex-grow: 1;
+            margin: 0 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+        }
+        
+        .compare-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-bar {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .comparison-fill {
+            height: 100%;
+            border-radius: 10px;
+            position: absolute;
+            top: 0;
+        }
+        
+        .footer {
+            background: linear-gradient(120deg, #2c3e50, #34495e);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .trophy {
+            font-size: 2.5rem;
+            color: #ffd700;
+            text-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .category-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 0;
+                border-radius: 0 0 20px 20px;
+            }
+            
+            .child-avatar {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Suivi des Progrès</h1>
+                    <p class="lead">Visualisez les accomplissements et la progression de votre enfant</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-inline-block bg-white p-3 rounded-pill">
+                        <i class="fas fa-trophy text-primary fa-3x floating"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <div class="row">
+            <!-- Profil enfant et vue d'ensemble -->
+            <div class="col-lg-4">
+                <div class="progress-card child-card">
+                    <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="child-avatar" alt="Lucas">
+                    <h3 class="fw-bold mb-1">Lucas Dubois</h3>
+                    <p class="text-muted mb-3">5 ans - Moyenne Section</p>
+                    
+                    <div class="progress-summary">
+                        <div class="summary-item">
+                            <div class="summary-value">87%</div>
+                            <div class="summary-label">Progrès</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">24</div>
+                            <div class="summary-label">Activités</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">12</div>
+                            <div class="summary-label">Badges</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center flex-wrap mb-3">
+                        <span class="badge bg-success badge-custom me-2 mb-2">
+                            <i class="fas fa-star me-1"></i> Élève modèle
+                        </span>
+                        <span class="badge bg-info badge-custom me-2 mb-2">
+                            <i class="fas fa-paint-brush me-1"></i> Artiste
+                        </span>
+                        <span class="badge bg-warning badge-custom mb-2">
+                            <i class="fas fa-music me-1"></i> Musicien
+                        </span>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-sync-alt me-2"></i>Changer d'enfant
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="card-body">
+                        <h3 class="fw-bold mb-4 text-center"><i class="fas fa-trophy me-2"></i>Récompenses</h3>
+                        
+                        <div class="text-center mb-4">
+                            <div class="trophy pulse">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h4 class="fw-bold">15 Étoiles</h4>
+                            <p class="text-muted">Continue comme ça!</p>
+                        </div>
+                        
+                        <div class="row text-center">
+                            <div class="col-4 mb-3">
+                                <div class="bg-warning text-white rounded-circle p-3 mx-auto" style="width: 70px; height: 70px;">
+                                    <i class="fas fa-medal fa-2x"></i>
+                                </div>
+                                <div class="mt-2">Or</div>
+                                <div class="fw-bold">5</div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="bg-secondary text-white rounded-circle p-3 mx-auto" style="width: 70px; height: 70px;">
+                                    <i class="fas fa-medal fa-2x"></i>
+                                </div>
+                                <div class="mt-2">Argent</div>
+                                <div class="fw-bold">7</div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <div class="bg-danger text-white rounded-circle p-3 mx-auto" style="width: 70px; height: 70px;">
+                                    <i class="fas fa-medal fa-2x"></i>
+                                </div>
+                                <div class="mt-2">Bronze</div>
+                                <div class="fw-bold">3</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-award me-2"></i>Voir toutes les récompenses
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="card-body">
+                        <h3 class="fw-bold mb-4"><i class="fas fa-bullseye me-2"></i>Objectifs</h3>
+                        
+                        <div class="milestone-item">
+                            <div class="milestone-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">Lire 5 livres</h5>
+                                <p class="mb-0">Progrès: 3/5 (60%)</p>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="milestone-item">
+                            <div class="milestone-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">Compter jusqu'à 50</h5>
+                                <p class="mb-0">Progrès: Maîtrise complète</p>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="milestone-item">
+                            <div class="milestone-icon">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">Créer 3 œuvres</h5>
+                                <p class="mb-0">Progrès: 2/3 (67%)</p>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Ajouter un objectif
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Détails des progrès -->
+            <div class="col-lg-8">
+                <div class="progress-card">
+                    <div class="card-body">
+                        <h3 class="fw-bold mb-4"><i class="fas fa-chart-bar me-2"></i>Progression Globale</h3>
+                        
+                        <div class="progress-chart-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap justify-content-center mt-4">
+                            <div class="me-3 mb-2">
+                                <span class="category-dot" style="background: var(--math-color);"></span>
+                                <span class="me-2">Mathématiques</span>
+                            </div>
+                            <div class="me-3 mb-2">
+                                <span class="category-dot" style="background: var(--language-color);"></span>
+                                <span class="me-2">Langage</span>
+                            </div>
+                            <div class="me-3 mb-2">
+                                <span class="category-dot" style="background: var(--art-color);"></span>
+                                <span class="me-2">Arts</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="category-dot" style="background: var(--science-color);"></span>
+                                <span>Science</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="progress-card h-100">
+                            <div class="card-body">
+                                <h3 class="fw-bold mb-4"><i class="fas fa-graduation-cap me-2"></i>Progrès par Cours</h3>
+                                
+                                <div class="activity-row">
+                                    <div class="activity-icon" style="background: var(--math-color);">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-0">Mathématiques</h6>
+                                        <small class="text-muted">Apprentissage des nombres</small>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 75%; background: var(--math-color);"></div>
+                                    </div>
+                                    <div class="fw-bold">75%</div>
+                                </div>
+                                
+                                <div class="activity-row">
+                                    <div class="activity-icon" style="background: var(--language-color);">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-0">Lecture</h6>
+                                        <small class="text-muted">Alphabet et mots simples</small>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 60%; background: var(--language-color);"></div>
+                                    </div>
+                                    <div class="fw-bold">60%</div>
+                                </div>
+                                
+                                <div class="activity-row">
+                                    <div class="activity-icon" style="background: var(--art-color);">
+                                        <i class="fas fa-paint-brush"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-0">Arts Plastiques</h6>
+                                        <small class="text-muted">Couleurs et formes</small>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 85%; background: var(--art-color);"></div>
+                                    </div>
+                                    <div class="fw-bold">85%</div>
+                                </div>
+                                
+                                <div class="activity-row">
+                                    <div class="activity-icon" style="background: var(--science-color);">
+                                        <i class="fas fa-flask"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-0">Découverte du monde</h6>
+                                        <small class="text-muted">Animaux et plantes</small>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 40%; background: var(--science-color);"></div>
+                                    </div>
+                                    <div class="fw-bold">40%</div>
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-list me-2"></i>Voir tous les cours
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="progress-card h-100">
+                            <div class="card-body">
+                                <h3 class="fw-bold mb-4"><i class="fas fa-child me-2"></i>Comparaison avec le Groupe</h3>
+                                
+                                <div class="compare-card mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>Lucas Dubois</div>
+                                        <div class="fw-bold">87%</div>
+                                    </div>
+                                    <div class="comparison-bar">
+                                        <div class="comparison-fill bg-success" style="width: 87%; left: 0;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="compare-card mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>Emma Lefevre</div>
+                                        <div class="fw-bold">92%</div>
+                                    </div>
+                                    <div class="comparison-bar">
+                                        <div class="comparison-fill bg-primary" style="width: 92%; left: 0;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="compare-card mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>Noah Martin</div>
+                                        <div class="fw-bold">78%</div>
+                                    </div>
+                                    <div class="comparison-bar">
+                                        <div class="comparison-fill bg-info" style="width: 78%; left: 0;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="compare-card">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>Moyenne du groupe</div>
+                                        <div class="fw-bold">85%</div>
+                                    </div>
+                                    <div class="comparison-bar">
+                                        <div class="comparison-fill bg-warning" style="width: 85%; left: 0;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-chart-container mt-4">
+                                    <canvas id="comparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="card-body">
+                        <h3 class="fw-bold mb-4"><i class="fas fa-history me-2"></i>Activités Récentes</h3>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Activité</th>
+                                        <th>Date</th>
+                                        <th>Durée</th>
+                                        <th>Score</th>
+                                        <th>Progrès</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3" style="background: var(--math-color);">
+                                                    <i class="fas fa-calculator"></i>
+                                                </div>
+                                                <div>Chasse aux nombres</div>
+                                            </div>
+                                        </td>
+                                        <td>15 Oct. 2023</td>
+                                        <td>12 min</td>
+                                        <td>9/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 90%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3" style="background: var(--language-color);">
+                                                    <i class="fas fa-book"></i>
+                                                </div>
+                                                <div>Lecture interactive</div>
+                                            </div>
+                                        </td>
+                                        <td>14 Oct. 2023</td>
+                                        <td>15 min</td>
+                                        <td>8/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 80%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3" style="background: var(--art-color);">
+                                                    <i class="fas fa-paint-brush"></i>
+                                                </div>
+                                                <div>Peinture créative</div>
+                                            </div>
+                                        </td>
+                                        <td>12 Oct. 2023</td>
+                                        <td>20 min</td>
+                                        <td>10/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3" style="background: var(--science-color);">
+                                                    <i class="fas fa-flask"></i>
+                                                </div>
+                                                <div>Découverte des plantes</div>
+                                            </div>
+                                        </td>
+                                        <td>10 Oct. 2023</td>
+                                        <td>10 min</td>
+                                        <td>7/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 70%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon me-3" style="background: var(--music-color);">
+                                                    <i class="fas fa-music"></i>
+                                                </div>
+                                                <div>Rythmes enfantins</div>
+                                            </div>
+                                        </td>
+                                        <td>8 Oct. 2023</td>
+                                        <td>8 min</td>
+                                        <td>8/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 80%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-download me-2"></i>Télécharger le rapport
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-print me-2"></i>Imprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3"><i class="fas fa-school me-2"></i>Garderie Scolaire</h5>
+                    <p>Nous offrons un environnement éducatif stimulant pour les enfants de 2 à 6 ans, combinant apprentissage et jeu.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Accueil</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Activités</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Progrès</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Devoirs</a></li>
+                        <li><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contactez-nous</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Rue de l'Éducation, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>contact@garderie-scolaire.fr</li>
+                        <li><i class="fas fa-clock me-2"></i>Lun-Ven: 8h00 - 18h00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Garderie Scolaire. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Graphique de progression globale
+            const progressCtx = document.getElementById('progressChart').getContext('2d');
+            const progressChart = new Chart(progressCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Mathématiques', 'Langage', 'Arts', 'Science', 'Musique', 'Social'],
+                    datasets: [{
+                        label: 'Progrès',
+                        data: [85, 70, 92, 65, 78, 80],
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                        borderColor: '#4361ee',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#4361ee',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#4361ee'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Graphique de comparaison
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            const comparisonChart = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Math', 'Langage', 'Arts', 'Science', 'Musique'],
+                    datasets: [
+                        {
+                            label: 'Lucas',
+                            data: [85, 70, 92, 65, 78],
+                            backgroundColor: '#4361ee',
+                            borderRadius: 5
+                        },
+                        {
+                            label: 'Moyenne',
+                            data: [75, 80, 85, 70, 75],
+                            backgroundColor: '#6c757d',
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Animation des cartes
+            const cards = document.querySelectorAll('.progress-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = "0";
+                    card.style.transform = "translateY(20px)";
+                    card.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                    
+                    setTimeout(() => {
+                        card.style.opacity = "1";
+                        card.style.transform = "translateY(0)";
+                    }, 100);
+                }, index * 150);
+            });
+            
+            // Simulation de changement d'enfant
+            document.querySelector('.btn-outline-primary').addEventListener('click', function() {
+                const children = [
+                    { name: "Lucas Dubois", age: "5 ans", avatar: "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" },
+                    { name: "Emma Lefevre", age: "4 ans", avatar: "https://images.unsplash.com/photo-1519242220831-09410926fbff?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" }
+                ];
+                
+                let currentChild = 0;
+                
+                if(this.textContent.includes("Lucas")) {
+                    currentChild = 1;
+                }
+                
+                const child = children[currentChild];
+                
+                // Mettre à jour l'affichage
+                document.querySelector('.child-avatar').src = child.avatar;
+                document.querySelector('.child-card h3').textContent = child.name;
+                document.querySelector('.child-card .text-muted').textContent = child.age;
+                this.innerHTML = `<i class="fas fa-sync-alt me-2"></i>Changer d'enfant (${currentChild === 0 ? 'Lucas' : 'Emma'})`;
+                
+                // Mettre à jour les données du graphique
+                const newData = currentChild === 0 ? 
+                    [85, 70, 92, 65, 78, 80] : 
+                    [92, 85, 75, 80, 70, 88];
+                
+                progressChart.data.datasets[0].data = newData;
+                progressChart.update();
+                
+                // Petit effet visuel
+                const avatar = document.querySelector('.child-avatar');
+                avatar.classList.add('floating');
+                setTimeout(() => {
+                    avatar.classList.remove('floating');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

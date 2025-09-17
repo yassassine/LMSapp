@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profil Enseignant - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Colonne de navigation latérale -->
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="position-relative d-inline-block">
+                        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/teacher-avatar.png' %}{% endif %}" 
+                             class="rounded-circle mb-3" 
+                             width="120" 
+                             height="120"
+                             alt="Photo de profil">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                    </div>
+                    <h4 class="mb-1">{{ user.get_full_name }}</h4>
+                    <p class="text-muted mb-3">Enseignant</p>
+                    
+                    <div class="list-group">
+                        <a href="#personal-info" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-user me-2"></i>Informations personnelles
+                        </a>
+                        <a href="#specialization" class="list-group-item list-group-item-action">
+                            <i class="fas fa-graduation-cap me-2"></i>Spécialité
+                        </a>
+                        <a href="#classes-section" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chalkboard me-2"></i>Mes classes
+                        </a>
+                        <a href="#contact-info" class="list-group-item list-group-item-action">
+                            <i class="fas fa-address-book me-2"></i>Coordonnées
+                        </a>
+                        <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-lock me-2"></i>Changer mot de passe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal du profil -->
+        <div class="col-md-9">
+            <!-- Section Informations personnelles -->
+            <div class="card shadow-sm mb-4" id="personal-info">
+                <div class="card-header bg-info text-white">
+                    <h3><i class="fas fa-user me-2"></i>Informations personnelles</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Nom complet</label>
+                            <p class="fs-5">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Identifiant</label>
+                            <p class="fs-5">{{ user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Date d'inscription</label>
+                            <p class="fs-5">{{ user.date_joined|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Années d'expérience</label>
+                            <p class="fs-5">{{ user.years_of_experience|default:"Non spécifié" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-info">
+                            <i class="fas fa-edit me-1"></i>Modifier mes informations
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Spécialité -->
+            <div class="card shadow-sm mb-4" id="specialization">
+                <div class="card-header bg-warning text-dark">
+                    <h3><i class="fas fa-graduation-cap me-2"></i>Spécialité</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Domaine d'expertise</label>
+                            <p class="fs-5">
+                                <span class="badge bg-primary fs-6">{{ user.specialization|default:"Non spécifié" }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Niveaux enseignés</label>
+                            <p class="fs-5">
+                                {% if user.taught_levels %}
+                                    {% for level in user.taught_levels.all %}
+                                        <span class="badge bg-success me-1">{{ level.name }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">Non spécifié</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-muted">Description</label>
+                            <div class="border p-3 rounded bg-light">
+                                {{ user.bio|default:"Aucune description fournie"|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="{% url 'edit_specialization' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-edit me-1"></i>Modifier ma spécialité
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Mes classes -->
+            <div class="card shadow-sm mb-4" id="classes-section">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3><i class="fas fa-chalkboard me-2"></i>Mes classes</h3>
+                        <a href="{% url 'create_course' %}" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-plus me-1"></i>Créer une classe
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    {% if courses %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Classe</th>
+                                    <th>Niveau</th>
+                                    <th>Élèves</th>
+                                    <th>Période</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'course_detail' course.id %}" class="text-decoration-none">
+                                            <strong>{{ course.title }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ course.level.name }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ course.students.count }} élèves</span>
+                                    </td>
+                                    <td>
+                                        {{ course.start_date|date:"d/m/Y" }} - {{ course.end_date|date:"d/m/Y" }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'course_edit' course.id %}" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'course_assignments' course.id %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-tasks"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Statistiques de classes -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <h2 class="text-primary">{{ active_courses_count }}</h2>
+                                    <p class="mb-0">Cours actifs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h2 class="text-success">{{ total_students }}</h2>
+                                    <p class="mb-0">Élèves total</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <h2 class="text-warning">{{ pending_assignments }}</h2>
+                                    <p class="mb-0">Devoirs à corriger</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center py-4">
+                        <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-info"></i>
+                        <h4>Vous n'avez pas encore de classes</h4>
+                        <p class="mb-0">Commencez par créer votre première classe pour organiser vos cours.</p>
+                        <a href="{% url 'create_course' %}" class="btn btn-info mt-3">
+                            <i class="fas fa-plus me-1"></i>Créer ma première classe
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section Coordonnées -->
+            <div class="card shadow-sm" id="contact-info">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-address-book me-2"></i>Coordonnées</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Email professionnel</label>
+                            <p class="fs-5">
+                                <i class="fas fa-envelope me-2 text-primary"></i>
+                                {{ user.email }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Téléphone</label>
+                            <p class="fs-5">
+                                <i class="fas fa-phone me-2 text-primary"></i>
+                                {{ user.phone_number|default:"Non spécifié" }}
+                            </p>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label text-muted">Disponibilités</label>
+                            <p class="fs-5">
+                                <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                                {{ user.availability|default:"Non spécifié" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'edit_contact' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>Modifier mes coordonnées
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .list-group-item.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .card-header h3 {
+        margin-bottom: 0;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+{% endblock %}

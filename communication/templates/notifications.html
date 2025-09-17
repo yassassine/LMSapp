@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-bell me-2"></i>Centre de notifications
+                </h1>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-filter me-1"></i>Filtrer
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="?filter=all">Toutes</a></li>
+                        <li><a class="dropdown-item" href="?filter=unread">Non lues</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="?filter=system">Système</a></li>
+                        <li><a class="dropdown-item" href="?filter=academic">Pédagogiques</a></li>
+                        <li><a class="dropdown-item" href="?filter=event">Événements</a></li>
+                    </ul>
+                    <button id="mark-all-read" class="btn btn-primary">
+                        <i class="bi bi-check-all me-1"></i>Tout marquer comme lu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-primary text-center py-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ unread_count }}</h5>
+                            <p class="card-text text-muted">Non lues</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-info text-center py-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ total_count }}</h5>
+                            <p class="card-text text-muted">Total</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success text-center py-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ this_week }}</h5>
+                            <p class="card-text text-muted">Cette semaine</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des notifications -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Historique des notifications</span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="unread-only">
+                            <label class="form-check-label" for="unread-only">Afficher uniquement les non lues</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-group list-group-flush">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                        <a href="{{ notification.url|default:'#' }}" 
+                           class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-warning{% endif %}">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3 mt-1">
+                                    {% if notification.notification_type == 'SYSTEM' %}
+                                        <i class="bi bi-gear-fill text-primary fs-4"></i>
+                                    {% elif notification.notification_type == 'ACADEMIC' %}
+                                        <i class="bi bi-journal-bookmark-fill text-success fs-4"></i>
+                                    {% elif notification.notification_type == 'EVENT' %}
+                                        <i class="bi bi-calendar-event-fill text-info fs-4"></i>
+                                    {% else %}
+                                        <i class="bi bi-bell-fill text-secondary fs-4"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-1">{{ notification.title }}</h5>
+                                        <small class="text-muted">{{ notification.created_at|timesince }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ notification.message|truncatechars:100 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <small class="text-muted">
+                                            {% if notification.is_read %}
+                                                <i class="bi bi-check2-all text-success"></i> Lu
+                                            {% else %}
+                                                <i class="bi bi-circle text-warning"></i> Non lue
+                                            {% endif %}
+                                        </small>
+                                        <div class="notification-actions">
+                                            {% if not notification.is_read %}
+                                            <button class="btn btn-sm btn-outline-success mark-as-read" 
+                                                    data-id="{{ notification.id }}">
+                                                Marquer comme lu
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-outline-danger delete-notification" 
+                                                    data-id="{{ notification.id }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                            <h4 class="mt-3">Aucune notification</h4>
+                            <p class="text-muted">Vous n'avez aucune notification pour le moment</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if notifications.has_other_pages %}
+                <div class="card-footer bg-white">
+                    <nav aria-label="Notifications navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if notifications.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" aria-label="Première">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.previous_page_number }}" aria-label="Précédente">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in notifications.paginator.page_range %}
+                                {% if notifications.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if notifications.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.next_page_number }}" aria-label="Suivante">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.paginator.num_pages }}" aria-label="Dernière">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Paramètres des notifications -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0"><i class="bi bi-sliders me-2"></i>Paramètres des notifications</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'update_notification_settings' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Fréquence des notifications par email</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="email_frequency" id="email_instant" value="instant">
+                                <label class="form-check-label" for="email_instant">Instantanées</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="email_frequency" id="email_daily" value="daily" checked>
+                                <label class="form-check-label" for="email_daily">Quotidiennes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="email_frequency" id="email_weekly" value="weekly">
+                                <label class="form-check-label" for="email_weekly">Hebdomadaires</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Types de notifications</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notif_events" checked>
+                                <label class="form-check-label" for="notif_events">Événements et activités</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notif_academic" checked>
+                                <label class="form-check-label" for="notif_academic">Mises à jour pédagogiques</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notif_system" checked>
+                                <label class="form-check-label" for="notif_system">Notifications système</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notif_messages">
+                                <label class="form-check-label" for="notif_messages">Messages privés</label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Enregistrer les paramètres
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Marquer une notification comme lue
+    document.querySelectorAll('.mark-as-read').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const notifId = this.dataset.id;
+            markNotificationAsRead(notifId, this);
+        });
+    });
+
+    // Marquer toutes les notifications comme lues
+    document.getElementById('mark-all-read').addEventListener('click', function() {
+        fetch("{% url 'mark_all_notifications_read' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelectorAll('.list-group-item-warning').forEach(item => {
+                    item.classList.remove('list-group-item-warning');
+                    item.querySelector('.mark-as-read').remove();
+                    item.querySelector('.text-warning').innerHTML = 
+                        '<i class="bi bi-check2-all text-success"></i> Lu';
+                });
+                updateNotificationBadge(0);
+            }
+        });
+    });
+
+    // Supprimer une notification
+    document.querySelectorAll('.delete-notification').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const notifId = this.dataset.id;
+            const notificationItem = this.closest('.list-group-item');
+            
+            fetch(`/communication/notifications/delete/${notifId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    notificationItem.remove();
+                    
+                    // Mettre à jour les compteurs
+                    if (notificationItem.classList.contains('list-group-item-warning')) {
+                        updateNotificationBadge(-1);
+                    }
+                }
+            });
+        });
+    });
+
+    // Fonction pour marquer une notification comme lue
+    function markNotificationAsRead(notifId, element) {
+        fetch(`/communication/notifications/mark-read/${notifId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const notificationItem = element.closest('.list-group-item');
+                notificationItem.classList.remove('list-group-item-warning');
+                element.remove();
+                
+                // Mettre à jour le statut
+                notificationItem.querySelector('.text-warning').innerHTML = 
+                    '<i class="bi bi-check2-all text-success"></i> Lu';
+                
+                // Mettre à jour le badge
+                updateNotificationBadge(-1);
+            }
+        });
+    }
+    
+    // Mettre à jour le badge de notifications non lues
+    function updateNotificationBadge(delta) {
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            let count = parseInt(badge.textContent) || 0;
+            count += delta;
+            badge.textContent = count > 0 ? count : '';
+            badge.classList.toggle('d-none', count <= 0);
+        }
+        
+        // Mettre à jour le compteur dans la page
+        const unreadCount = document.querySelector('.card-title');
+        if (unreadCount) {
+            let count = parseInt(unreadCount.textContent) || 0;
+            count += delta;
+            unreadCount.textContent = count;
+        }
+    }
+    
+    // Filtre "Afficher uniquement les non lues"
+    document.getElementById('unread-only').addEventListener('change', function() {
+        document.querySelectorAll('.list-group-item').forEach(item => {
+            if (this.checked && !item.classList.contains('list-group-item-warning')) {
+                item.style.display = 'none';
+            } else {
+                item.style.display = 'block';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

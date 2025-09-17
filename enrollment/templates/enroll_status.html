@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>Statut des Inscriptions
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    {% if enrollments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Enfant</th>
+                                        <th>Date de naissance</th>
+                                        <th>Date de soumission</th>
+                                        <th>Statut</th>
+                                        <th>Détails</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrollment in enrollments %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ enrollment.child_first_name }} {{ enrollment.child_last_name }}</strong>
+                                            <div class="text-muted small">Niveau: {{ enrollment.grade_level }}</div>
+                                        </td>
+                                        <td>{{ enrollment.birth_date|date:"d/m/Y" }}</td>
+                                        <td>{{ enrollment.created_at|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if enrollment.is_approved %}
+                                                <span class="badge bg-success rounded-pill">
+                                                    <i class="fas fa-check-circle me-1"></i>Approuvé
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning rounded-pill">
+                                                    <i class="fas fa-clock me-1"></i>En attente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'enrollment:enrollment_detail' enrollment.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>Voir
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-file-alt fa-4x text-muted"></i>
+                            </div>
+                            <h4 class="text-muted">Aucune inscription trouvée</h4>
+                            <p class="text-muted">Vous n'avez soumis aucune demande d'inscription pour le moment.</p>
+                            <a href="{% url 'enrollment:enroll_form' %}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus-circle me-1"></i>Nouvelle inscription
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if enrollments %}
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Le traitement des inscriptions prend généralement 2-3 jours ouvrés
+                            </small>
+                        </div>
+                        <a href="{% url 'enrollment:enroll_form' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-plus-circle me-1"></i>Ajouter un autre enfant
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Section FAQ -->
+            <div class="card border-info mt-4">
+                <div class="card-header bg-white border-info">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle text-info me-2"></i>
+                        Questions Fréquentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    Combien de temps prend le traitement d'une inscription?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Le traitement des inscriptions prend généralement <strong>2 à 3 jours ouvrés</strong>. 
+                                    Vous recevrez une notification par email dès que votre inscription sera approuvée.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    Que faire si le statut reste "En attente" longtemps?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Si votre inscription est en attente depuis plus de 5 jours ouvrés, 
+                                    veuillez contacter notre équipe administrative au 
+                                    <strong>01 23 45 67 89</strong> ou par email à 
+                                    <a href="mailto:admin@garderie-exemple.fr">admin@garderie-exemple.fr</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0d6efd;
+    }
+</style>
+{% endblock %}

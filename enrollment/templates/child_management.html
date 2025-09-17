@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-child me-2 text-primary"></i>Gestion des enfants inscrits
+        </h2>
+        <a href="{% url 'enrollment:enroll_form' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-1"></i>Ajouter un enfant
+        </a>
+    </div>
+    
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-light py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Vos enfants inscrits</h4>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="fas fa-filter me-1"></i>Filtrer
+                    </button>
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <input type="text" class="form-control" placeholder="Rechercher un enfant..." id="searchInput">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            {% if children %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Enfant</th>
+                            <th>Groupe</th>
+                            <th>Statut</th>
+                            <th>Inscrit depuis</th>
+                            <th>Prochain paiement</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for child in children %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-3">
+                                        {% if child.photo %}
+                                            <img src="{{ child.photo.url }}" alt="{{ child.full_name }}" class="rounded-circle" width="40" height="40">
+                                        {% else %}
+                                            <div class="avatar-placeholder rounded-circle bg-light d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-child text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ child.full_name }}</strong>
+                                        <div class="text-muted small">
+                                            {{ child.birth_date|date:"d/m/Y" }} ({{ child.age }} ans) - {{ child.grade_level }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if child.group %}
+                                    <span class="badge bg-info">{{ child.group.name }}</span>
+                                    <div class="small text-muted">Enseignant: {{ child.group.teacher.get_full_name|default:"Non assigné" }}</div>
+                                {% else %}
+                                    <span class="text-muted">Non assigné</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if child.is_active %}
+                                    <span class="badge bg-success rounded-pill">
+                                        <i class="fas fa-check-circle me-1"></i>Actif
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-pill">
+                                        <i class="fas fa-times-circle me-1"></i>Inactif
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ child.enrollment_date|date:"d/m/Y" }}</div>
+                                <div class="small text-muted">{{ child.enrollment_date|timesince }}</div>
+                            </td>
+                            <td>
+                                {% if child.next_payment_due %}
+                                    <div>{{ child.next_payment_due|date:"d/m/Y" }}</div>
+                                    <div class="small {% if child.payment_status == 'due_soon' %}text-warning{% elif child.payment_status == 'overdue' %}text-danger{% else %}text-success{% endif %}">
+                                        {{ child.get_payment_status_display }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Non applicable</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'enrollment:child_detail' child.id %}" 
+                                       class="btn btn-sm btn-outline-primary" title="Voir le profil">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'enrollment:update_child' child.id %}" 
+                                       class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if child.is_active %}
+                                    <form method="post" action="{% url 'enrollment:deactivate_child' child.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Désinscrire">
+                                            <i class="fas fa-user-times"></i>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="post" action="{% url 'enrollment:activate_child' child.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Réinscrire">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-child fa-4x text-muted"></i>
+                </div>
+                <h4 class="text-muted">Aucun enfant inscrit</h4>
+                <p class="text-muted">Vous n'avez encore inscrit aucun enfant dans notre garderie.</p>
+                <a href="{% url 'enrollment:enroll_form' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus-circle me-1"></i>Inscrire un enfant
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if children %}
+        <div class="card-footer bg-light py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Affichage de <strong>{{ children|length }}</strong> enfant{{ children|pluralize }}
+                </div>
+                <div>
+                    <span class="me-3">
+                        <i class="fas fa-circle text-success me-1 small"></i> Actif
+                    </span>
+                    <span>
+                        <i class="fas fa-circle text-secondary me-1 small"></i> Inactif
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Section des paiements -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card border-primary shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-receipt me-2"></i>Derniers paiements
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if payments %}
+                    <div class="list-group">
+                        {% for payment in payments %}
+                        <div class="list-group-item list-group-item-action border-0">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ payment.description }}</strong>
+                                    <div class="small">{{ payment.child.full_name }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="d-block fw-bold">{{ payment.amount }} €</span>
+                                    <span class="small text-muted">{{ payment.date|date:"d/m/Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">Aucun paiement récent</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <a href="#" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-history me-1"></i>Voir l'historique complet
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-info shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Événements à venir
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if events %}
+                    <div class="list-group">
+                        {% for event in events %}
+                        <div class="list-group-item list-group-item-action border-0">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ event.title }}</strong>
+                                    <div class="small">{{ event.child.full_name }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="d-block">{{ event.date|date:"d/m/Y" }}</span>
+                                    <span class="small text-muted">{{ event.time|time:"H:i" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">Aucun événement à venir</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <a href="{% url 'core:schedule' %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-calendar me-1"></i>Voir le calendrier complet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Filtre -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filtrer les enfants</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label class="form-label">Statut</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="statusActive" checked>
+                                <label class="form-check-label" for="statusActive">Actif</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="statusInactive">
+                                <label class="form-check-label" for="statusInactive">Inactif</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Groupe</label>
+                        <select class="form-select" id="groupFilter">
+                            <option value="">Tous les groupes</option>
+                            <option value="group1">Petits (2-3 ans)</option>
+                            <option value="group2">Moyens (4-5 ans)</option>
+                            <option value="group3">Grands (5-6 ans)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Statut de paiement</label>
+                        <select class="form-select" id="paymentFilter">
+                            <option value="">Tous</option>
+                            <option value="paid">Payé</option>
+                            <option value="due_soon">Dû bientôt</option>
+                            <option value="overdue">En retard</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Appliquer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-placeholder {
+        background-color: #e9ecef;
+        color: #6c757d;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Fonctionnalité de recherche
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const name = row.querySelector('td:first-child strong').textContent.toLowerCase();
+            if (name.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Fonctionnalité de filtrage
+    document.querySelector('#filterModal .btn-primary').addEventListener('click', function() {
+        // Implémenter la logique de filtrage ici
+        alert('Filtres appliqués! Cette fonctionnalité sera complète dans la prochaine version.');
+    });
+</script>
+{% endblock %}

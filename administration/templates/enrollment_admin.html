@@ -1,0 +1,625 @@
+{% extends "administration/base_admin.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Custom styles for enrollment admin */
+    .status-badge {
+        min-width: 85px;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+        list-style: none;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -20px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #6c757d;
+    }
+    
+    .timeline-content {
+        padding-left: 10px;
+    }
+    
+    .action-buttons .btn {
+        padding: 3px 8px;
+        font-size: 0.875rem;
+    }
+    
+    .filter-card .card-body {
+        padding-bottom: 0.75rem;
+    }
+    
+    .document-badge {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Supervision des inscriptions</h1>
+    
+    <!-- Filtres et Recherche -->
+    <div class="card mb-4 filter-card">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">Filtres et Recherche</h5>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button class="btn btn-sm btn-outline-secondary" id="export-csv">
+                        <i class="fas fa-file-export me-1"></i> Exporter CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Statut</label>
+                    <select class="form-select" id="status-filter">
+                        <option value="">Tous</option>
+                        <option value="pending">En attente</option>
+                        <option value="approved">Approuvé</option>
+                        <option value="rejected">Rejeté</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date d'inscription</label>
+                    <input type="date" class="form-control" id="date-filter">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Groupe d'âge</label>
+                    <select class="form-select" id="age-group-filter">
+                        <option value="">Tous</option>
+                        <option value="2-3">2-3 ans</option>
+                        <option value="4-5">4-5 ans</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Recherche</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search-input" placeholder="Nom enfant/parent...">
+                        <button class="btn btn-primary" type="button" id="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des inscriptions -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Liste des inscriptions</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Enfant</th>
+                            <th>Parent</th>
+                            <th>Date d'inscription</th>
+                            <th>Groupe</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enrollments-table-body">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav class="px-3 py-2 border-top d-flex justify-content-between">
+                <div class="text-muted" id="pagination-info">
+                    Affichage de <span id="start-rec">1</span> à <span id="end-rec">10</span> de <span id="total-rec">32</span> inscriptions
+                </div>
+                <ul class="pagination mb-0" id="pagination-controls">
+                    <li class="page-item disabled"><a class="page-link" href="#" data-page="prev">Précédent</a></li>
+                    <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="2">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="3">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-page="next">Suivant</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Inscription -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Détails de l'inscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-details-content">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="print-details">
+                    <i class="fas fa-print me-1"></i> Imprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sample enrollment data (in a real app, this would come from Django context or API)
+const enrollmentsData = [
+    {
+        id: "EN-1025",
+        child: {
+            name: "Emma Dubois",
+            birthDate: "15/03/2023",
+            age: "2 ans",
+            allergies: "Aucune connue",
+            photo: "emma.jpg"
+        },
+        parent: {
+            name: "Sophie Dubois",
+            phone: "06 12 34 56 78",
+            email: "s.dubois@example.com"
+        },
+        enrollmentDate: "25/07/2025",
+        ageGroup: "Petits (2-3 ans)",
+        status: "pending",
+        medicalNotes: "Aucune note médicale particulière",
+        documents: [
+            { name: "Certificat_medical.pdf", type: "pdf" },
+            { name: "Photo_identite.jpg", type: "image" }
+        ],
+        history: [
+            { event: "Inscription soumise", date: "25/07/2025 à 14:30", user: "Système" }
+        ]
+    },
+    {
+        id: "EN-1026",
+        child: {
+            name: "Lucas Martin",
+            birthDate: "10/01/2021",
+            age: "4 ans",
+            allergies: "Lait, noix",
+            photo: "lucas.jpg"
+        },
+        parent: {
+            name: "Thomas Martin",
+            phone: "06 98 76 54 32",
+            email: "t.martin@example.com"
+        },
+        enrollmentDate: "24/07/2025",
+        ageGroup: "Moyens (4-5 ans)",
+        status: "approved",
+        medicalNotes: "Allergies alimentaires nécessitant un plan d'action",
+        documents: [
+            { name: "Certificat_medical.pdf", type: "pdf" },
+            { name: "Photo_identite.jpg", type: "image" },
+            { name: "Plan_allergie.pdf", type: "pdf" }
+        ],
+        history: [
+            { event: "Inscription soumise", date: "24/07/2025 à 11:15", user: "Système" },
+            { event: "Statut changé à Approuvé", date: "25/07/2025 à 09:45", user: "Admin" }
+        ]
+    },
+    {
+        id: "EN-1027",
+        child: {
+            name: "Chloé Bernard",
+            birthDate: "22/09/2022",
+            age: "2 ans",
+            allergies: "Aucune",
+            photo: "chloe.jpg"
+        },
+        parent: {
+            name: "Marie Bernard",
+            phone: "07 65 43 21 09",
+            email: "m.bernard@example.com"
+        },
+        enrollmentDate: "23/07/2025",
+        ageGroup: "Petits (2-3 ans)",
+        status: "rejected",
+        medicalNotes: "Aucune note médicale",
+        documents: [
+            { name: "Certificat_medical.pdf", type: "pdf" }
+        ],
+        history: [
+            { event: "Inscription soumise", date: "23/07/2025 à 16:20", user: "Système" },
+            { event: "Statut changé à Rejeté", date: "24/07/2025 à 10:30", user: "Admin" }
+        ]
+    }
+];
+
+// Current page state
+let currentPage = 1;
+const recordsPerPage = 5;
+let filteredData = [...enrollmentsData];
+
+// DOM Elements
+const tableBody = document.getElementById('enrollments-table-body');
+const modalContent = document.getElementById('modal-details-content');
+const paginationInfo = document.getElementById('pagination-info');
+const paginationControls = document.getElementById('pagination-controls');
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+    renderEnrollmentsTable();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Filter event listeners
+    document.getElementById('status-filter').addEventListener('change', applyFilters);
+    document.getElementById('date-filter').addEventListener('change', applyFilters);
+    document.getElementById('age-group-filter').addEventListener('change', applyFilters);
+    document.getElementById('search-btn').addEventListener('click', applyFilters);
+    document.getElementById('search-input').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+    
+    // Export CSV
+    document.getElementById('export-csv').addEventListener('click', exportToCSV);
+    
+    // Print details
+    document.getElementById('print-details').addEventListener('click', printDetails);
+    
+    // Pagination
+    paginationControls.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = e.target.closest('.page-link');
+        if (!target) return;
+        
+        const pageAction = target.getAttribute('data-page');
+        
+        if (pageAction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (pageAction === 'next' && currentPage < Math.ceil(filteredData.length / recordsPerPage)) {
+            currentPage++;
+        } else if (!isNaN(parseInt(pageAction))) {
+            currentPage = parseInt(pageAction);
+        }
+        
+        renderEnrollmentsTable();
+    });
+    
+    // Modal show event
+    document.getElementById('detailModal').addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const enrollmentId = button.getAttribute('data-enrollment-id');
+        const enrollment = filteredData.find(e => e.id === enrollmentId);
+        
+        if (enrollment) {
+            renderModalContent(enrollment);
+        }
+    });
+}
+
+function applyFilters() {
+    const status = document.getElementById('status-filter').value;
+    const date = document.getElementById('date-filter').value;
+    const ageGroup = document.getElementById('age-group-filter').value;
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    
+    filteredData = enrollmentsData.filter(enrollment => {
+        // Status filter
+        if (status && enrollment.status !== status) return false;
+        
+        // Date filter
+        if (date && enrollment.enrollmentDate !== date) return false;
+        
+        // Age group filter
+        if (ageGroup && !enrollment.ageGroup.includes(ageGroup)) return false;
+        
+        // Search filter
+        if (searchTerm) {
+            const childMatch = enrollment.child.name.toLowerCase().includes(searchTerm);
+            const parentMatch = enrollment.parent.name.toLowerCase().includes(searchTerm);
+            if (!childMatch && !parentMatch) return false;
+        }
+        
+        return true;
+    });
+    
+    currentPage = 1;
+    renderEnrollmentsTable();
+}
+
+function renderEnrollmentsTable() {
+    // Clear existing table rows
+    tableBody.innerHTML = '';
+    
+    // Calculate pagination
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = Math.min(startIndex + recordsPerPage, filteredData.length);
+    const currentPageData = filteredData.slice(startIndex, endIndex);
+    
+    // Update pagination info
+    document.getElementById('start-rec').textContent = startIndex + 1;
+    document.getElementById('end-rec').textContent = endIndex;
+    document.getElementById('total-rec').textContent = filteredData.length;
+    
+    // Generate table rows
+    currentPageData.forEach(enrollment => {
+        const row = document.createElement('tr');
+        
+        // Status badge
+        let statusBadge;
+        if (enrollment.status === 'approved') {
+            statusBadge = '<span class="badge bg-success status-badge">Approuvé</span>';
+        } else if (enrollment.status === 'rejected') {
+            statusBadge = '<span class="badge bg-danger status-badge">Rejeté</span>';
+        } else {
+            statusBadge = '<span class="badge bg-warning status-badge">En attente</span>';
+        }
+        
+        // Action buttons
+        let actionButtons = `
+            <button class="btn btn-sm btn-outline-primary" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#detailModal"
+                    data-enrollment-id="${enrollment.id}">
+                <i class="fas fa-eye"></i>
+            </button>
+        `;
+        
+        if (enrollment.status !== 'approved') {
+            actionButtons += `
+                <button class="btn btn-sm btn-outline-success ms-1" onclick="updateStatus('${enrollment.id}', 'approved')">
+                    <i class="fas fa-check"></i>
+                </button>
+            `;
+        }
+        
+        if (enrollment.status !== 'rejected') {
+            actionButtons += `
+                <button class="btn btn-sm btn-outline-danger ms-1" onclick="updateStatus('${enrollment.id}', 'rejected')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+        }
+        
+        if (enrollment.status !== 'pending') {
+            actionButtons += `
+                <button class="btn btn-sm btn-outline-warning ms-1" onclick="updateStatus('${enrollment.id}', 'pending')">
+                    <i class="fas fa-undo"></i>
+                </button>
+            `;
+        }
+        
+        row.innerHTML = `
+            <td>${enrollment.id}</td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-2">
+                        <div class="avatar-title bg-light rounded-circle">
+                            <i class="fas fa-child text-primary"></i>
+                        </div>
+                    </div>
+                    <div>${enrollment.child.name}</div>
+                </div>
+            </td>
+            <td>${enrollment.parent.name}</td>
+            <td>${enrollment.enrollmentDate}</td>
+            <td>${enrollment.ageGroup}</td>
+            <td>${statusBadge}</td>
+            <td class="action-buttons">
+                ${actionButtons}
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // Update pagination controls
+    updatePaginationControls();
+}
+
+function updatePaginationControls() {
+    const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="prev">Précédent</a>
+        </li>
+    `;
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+        `;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="next">Suivant</a>
+        </li>
+    `;
+    
+    paginationControls.innerHTML = paginationHTML;
+}
+
+function renderModalContent(enrollment) {
+    // Generate documents badges
+    let documentsHTML = '';
+    enrollment.documents.forEach(doc => {
+        const iconClass = doc.type === 'pdf' ? 'fa-file-pdf text-danger' : 'fa-file-image text-success';
+        documentsHTML += `
+            <span class="badge bg-light text-dark border document-badge" onclick="viewDocument('${doc.name}')">
+                <i class="fas ${iconClass} me-1"></i> ${doc.name}
+            </span>
+        `;
+    });
+    
+    // Generate history timeline
+    let historyHTML = '';
+    enrollment.history.forEach((item, index) => {
+        historyHTML += `
+            <li class="timeline-item">
+                <span class="timeline-marker ${index === 0 ? 'bg-primary' : 'bg-secondary'}"></span>
+                <div class="timeline-content">
+                    <p class="mb-1">${item.event}</p>
+                    <small class="text-muted">${item.date} par ${item.user}</small>
+                </div>
+            </li>
+        `;
+    });
+    
+    modalContent.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Informations Enfant</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Nom complet:</span>
+                        <span>${enrollment.child.name}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Date de naissance:</span>
+                        <span>${enrollment.child.birthDate} (${enrollment.child.age})</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Allergies:</span>
+                        <span>${enrollment.child.allergies}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Notes médicales:</span>
+                        <span>${enrollment.medicalNotes}</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-md-6">
+                <h6>Informations Parent</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Responsable:</span>
+                        <span>${enrollment.parent.name}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Téléphone:</span>
+                        <span>${enrollment.parent.phone}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Email:</span>
+                        <span>${enrollment.parent.email}</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <h6>Documents fournis</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    ${documentsHTML}
+                </div>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <h6>Historique de statut</h6>
+                <ul class="timeline">
+                    ${historyHTML}
+                </ul>
+            </div>
+        </div>
+    `;
+}
+
+// Action functions
+function updateStatus(enrollmentId, newStatus) {
+    const enrollment = enrollmentsData.find(e => e.id === enrollmentId);
+    if (enrollment) {
+        const oldStatus = enrollment.status;
+        enrollment.status = newStatus;
+        
+        // Add to history
+        enrollment.history.unshift({
+            event: `Statut changé à ${getStatusDisplay(newStatus)}`,
+            date: new Date().toLocaleString('fr-FR'),
+            user: "Administrateur"
+        });
+        
+        // Re-render table
+        renderEnrollmentsTable();
+        
+        // Show success message
+        showToast(`Statut de l'inscription ${enrollmentId} mis à jour`, 'success');
+    }
+}
+
+function viewDocument(documentName) {
+    alert(`Visualiser le document: ${documentName}\n\nDans une implémentation réelle, ceci ouvrirait le document.`);
+}
+
+function exportToCSV() {
+    // In a real implementation, this would generate a CSV file
+    alert('Exportation CSV démarrée!\n\nLes données seront téléchargées sous forme de fichier CSV.');
+    showToast('Export CSV en cours...', 'info');
+    
+    // Simulate delay for export
+    setTimeout(() => {
+        showToast('Export CSV terminé avec succès!', 'success');
+    }, 2000);
+}
+
+function printDetails() {
+    // Print the modal content
+    alert('Impression des détails de l\'inscription\n\nDans une implémentation réelle, ceci ouvrirait la boîte de dialogue d\'impression.');
+}
+
+function getStatusDisplay(status) {
+    switch(status) {
+        case 'approved': return 'Approuvé';
+        case 'rejected': return 'Rejeté';
+        default: return 'En attente';
+    }
+}
+
+// Utility function to show toast notifications
+function showToast(message, type = 'info') {
+    // In a real implementation, this would show a toast notification
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+// Initial render
+renderEnrollmentsTable();
+</script>
+{% endblock %}

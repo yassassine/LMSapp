@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profil Parent - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Colonne de navigation latérale -->
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="position-relative d-inline-block">
+                        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                             class="rounded-circle mb-3" 
+                             width="120" 
+                             height="120"
+                             alt="Photo de profil">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                    </div>
+                    <h4 class="mb-1">{{ user.get_full_name }}</h4>
+                    <p class="text-muted mb-3">Parent</p>
+                    
+                    <div class="list-group">
+                        <a href="#personal-info" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-user me-2"></i>Informations personnelles
+                        </a>
+                        <a href="#children-section" class="list-group-item list-group-item-action">
+                            <i class="fas fa-child me-2"></i>Mes enfants
+                        </a>
+                        <a href="#contact-info" class="list-group-item list-group-item-action">
+                            <i class="fas fa-address-book me-2"></i>Coordonnées
+                        </a>
+                        <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-lock me-2"></i>Changer mot de passe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal du profil -->
+        <div class="col-md-9">
+            <!-- Section Informations personnelles -->
+            <div class="card shadow-sm mb-4" id="personal-info">
+                <div class="card-header bg-info text-white">
+                    <h3><i class="fas fa-user me-2"></i>Informations personnelles</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Nom complet</label>
+                            <p class="fs-5">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Date de naissance</label>
+                            <p class="fs-5">{{ user.birth_date|default:"Non spécifié" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Identifiant</label>
+                            <p class="fs-5">{{ user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Date d'inscription</label>
+                            <p class="fs-5">{{ user.date_joined|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-info">
+                            <i class="fas fa-edit me-1"></i>Modifier mes informations
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Mes enfants -->
+            <div class="card shadow-sm mb-4" id="children-section">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3><i class="fas fa-child me-2"></i>Mes enfants</h3>
+                        <a href="{% url 'add_child' %}" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-plus me-1"></i>Ajouter un enfant
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    {% if user.children.all %}
+                    <div class="row">
+                        {% for child in user.children.all %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-primary">
+                                <div class="card-header bg-light">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-0">{{ child.user.get_full_name }}</h5>
+                                        <span class="badge bg-primary">{{ child.grade_level }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar me-3">
+                                            <img src="{% if child.user.profile_picture %}{{ child.user.profile_picture.url }}{% else %}{% static 'images/child-avatar.png' %}{% endif %}" 
+                                                 class="rounded-circle" 
+                                                 width="60" 
+                                                 height="60"
+                                                 alt="Photo de {{ child.user.first_name }}">
+                                        </div>
+                                        <div>
+                                            <p class="mb-1"><strong>Date de naissance:</strong> {{ child.user.birth_date|date:"d/m/Y" }}</p>
+                                            <p class="mb-0"><strong>Niveau scolaire:</strong> {{ child.grade_level }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Informations médicales</label>
+                                        <p>{{ child.user.medical_notes|default:"Aucune information médicale"|truncatechars:100 }}</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Contact d'urgence</label>
+                                        <p>{{ child.emergency_contact }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'child_detail' child.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>Détails
+                                        </a>
+                                        <a href="{% url 'edit_child' child.id %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit me-1"></i>Modifier
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun enfant inscrit. Ajoutez votre premier enfant pour commencer.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section Coordonnées -->
+            <div class="card shadow-sm" id="contact-info">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="fas fa-address-book me-2"></i>Coordonnées</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <p class="fs-5">
+                                <i class="fas fa-envelope me-2 text-success"></i>
+                                {{ user.email }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Téléphone</label>
+                            <p class="fs-5">
+                                <i class="fas fa-phone me-2 text-success"></i>
+                                {{ user.phone_number|default:"Non spécifié" }}
+                            </p>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label text-muted">Adresse</label>
+                            <p class="fs-5">
+                                <i class="fas fa-home me-2 text-success"></i>
+                                {{ user.address|default:"Adresse non spécifiée" }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'edit_contact' %}" class="btn btn-outline-success">
+                            <i class="fas fa-edit me-1"></i>Modifier mes coordonnées
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar img {
+        object-fit: cover;
+    }
+    .list-group-item.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .card-header h3 {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}

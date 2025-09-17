@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Activités Proposées - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<!-- Section Hero -->
+<section class="activities-hero bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">Nos Activités Éducatives</h1>
+                <p class="lead mb-4">Découvrez notre programme d'activités variées conçues pour l'épanouissement et le développement des enfants</p>
+                
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#activities-grid" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-star me-2"></i>Voir les activités
+                    </a>
+                    <a href="{% url 'enroll_form' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>Inscrire mon enfant
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="position-relative">
+                    <img src="{% static 'images/activities-hero.png' %}" class="img-fluid rounded-3 shadow-lg" alt="Enfants participant à des activités">
+                    <div class="position-absolute top-0 start-0 bg-warning text-dark p-2 rounded-end">
+                        <i class="fas fa-certificate me-1"></i>Activités incluses
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Filtres et Recherche -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="search-activities" class="form-control form-control-lg border-start-0" placeholder="Rechercher une activité...">
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <select id="category-filter" class="form-select form-select-lg">
+                    <option value="all">Toutes les catégories</option>
+                    <option value="arts">Arts créatifs</option>
+                    <option value="sports">Sports & Motricité</option>
+                    <option value="science">Sciences & Nature</option>
+                    <option value="music">Musique & Danse</option>
+                    <option value="language">Langues & Lecture</option>
+                    <option value="technology">Technologie</option>
+                </select>
+            </div>
+            
+            <div class="col-lg-3">
+                <select id="age-filter" class="form-select form-select-lg">
+                    <option value="all">Tous les âges</option>
+                    <option value="2-3">2-3 ans</option>
+                    <option value="4-5">4-5 ans</option>
+                    <option value="6-7">6-7 ans</option>
+                    <option value="8+">8 ans et plus</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Grille d'Activités -->
+<section id="activities-grid" class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-puzzle-piece me-2 text-primary"></i>Activités Régulières</h2>
+                <p class="text-muted">Programme hebdomadaire d'activités éducatives et ludiques</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for activity in regular_activities %}
+            <div class="col-xl-4 col-lg-6 activity-item" data-category="{{ activity.category }}" data-age="{{ activity.age_group }}">
+                <div class="card activity-card h-100 border-0 shadow-sm">
+                    <div class="position-relative">
+                        <img src="{{ activity.image.url }}" class="card-img-top" alt="{{ activity.title }}">
+                        <div class="activity-badge bg-{{ activity.get_badge_color }} text-white">
+                            {{ activity.get_category_display }}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h3 class="h5 card-title mb-0">{{ activity.title }}</h3>
+                            <span class="badge bg-info">{{ activity.age_group }}</span>
+                        </div>
+                        
+                        <p class="card-text">{{ activity.short_description }}</p>
+                        
+                        <div class="activity-meta mb-3">
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock me-1 text-primary"></i> {{ activity.duration }} min
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-user me-1 text-primary"></i> Max. {{ activity.max_participants }} enfants
+                                </span>
+                                {% if activity.weekly %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-calendar me-1 text-primary"></i> Hebdomadaire
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ activity.teacher.photo.url|default:'/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle me-2" 
+                                         width="30" 
+                                         height="30"
+                                         alt="{{ activity.teacher.name }}">
+                                    <span class="small">{{ activity.teacher.name }}</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'activity_detail' activity.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-info-circle me-1"></i>Détails
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                        <div>
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= activity.difficulty %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="small ms-1">Difficulté</span>
+                        </div>
+                        <div class="text-end">
+                            {% if activity.is_free %}
+                            <span class="badge bg-success">Gratuit</span>
+                            {% else %}
+                            <span class="badge bg-light text-dark">{{ activity.price }}€/session</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-puzzle-piece fa-3x text-muted mb-3"></i>
+                <h3>Aucune activité pour le moment</h3>
+                <p class="text-muted">Notre programme d'activités sera bientôt disponible</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Section Activités Spéciales -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-calendar-star me-2 text-warning"></i>Activités Spéciales & Événements</h2>
+                <p class="text-muted">Découvrez nos événements uniques et ateliers exceptionnels</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="owl-carousel special-activities-carousel">
+                    {% for activity in special_activities %}
+                    <div class="special-activity-item">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="position-relative">
+                                <img src="{{ activity.image.url }}" class="card-img-top" alt="{{ activity.title }}">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-danger">Spécial</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h3 class="h5 card-title mb-0">{{ activity.title }}</h3>
+                                    <span class="badge bg-info">{{ activity.age_group }}</span>
+                                </div>
+                                
+                                <p class="card-text small">{{ activity.short_description|truncatechars:100 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                        <p class="mb-0 small">
+                                            <i class="fas fa-calendar-day me-1 text-warning"></i>
+                                            {{ activity.date|date:"d/m/Y" }} à {{ activity.time|time:"H:i" }}
+                                        </p>
+                                    </div>
+                                    <a href="{% url 'activity_detail' activity.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-ticket-alt me-1"></i>Réserver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h3>Aucune activité spéciale prévue</h3>
+                        <p class="text-muted">Revenez bientôt pour découvrir nos prochains événements</p>
+                        <a href="{% url 'events' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-calendar-alt me-1"></i>Voir le calendrier
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Activités par Âge -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-child me-2 text-success"></i>Activités par Âge</h2>
+                <p class="text-muted">Des programmes adaptés à chaque étape de développement</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- 2-3 ans -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card age-group-card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="h5 mb-0 text-center">2-3 ans</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-baby fa-3x text-info"></i>
+                        </div>
+                        <h4 class="h5 text-center mb-3">Éveil sensoriel</h4>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check text-info"></i></span>Jeux d'eau et sable</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-info"></i></span>Éveil musical</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-info"></i></span>Parcours moteur</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-info"></i></span>Peinture sensorielle</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-info"></i></span>Comptines et histoires</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center">
+                        <a href="#activities-grid" class="btn btn-sm btn-outline-info" data-age-filter="2-3">
+                            Voir les activités
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4-5 ans -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card age-group-card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="h5 mb-0 text-center">4-5 ans</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-child fa-3x text-success"></i>
+                        </div>
+                        <h4 class="h5 text-center mb-3">Découverte créative</h4>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Arts plastiques</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Initiation sportive</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Jardinage pédagogique</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Théâtre et marionnettes</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-success"></i></span>Expériences scientifiques simples</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center">
+                        <a href="#activities-grid" class="btn btn-sm btn-outline-success" data-age-filter="4-5">
+                            Voir les activités
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 6-7 ans -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card age-group-card border-0 shadow-sm h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="h5 mb-0 text-center">6-7 ans</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-user-graduate fa-3x text-warning"></i>
+                        </div>
+                        <h4 class="h5 text-center mb-3">Apprentissage actif</h4>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check text-warning"></i></span>Robotique éducative</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-warning"></i></span>Ateliers cuisine</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-warning"></i></span>Sports collectifs</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-warning"></i></span>Projets scientifiques</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-warning"></i></span>Club de lecture</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center">
+                        <a href="#activities-grid" class="btn btn-sm btn-outline-warning" data-age-filter="6-7">
+                            Voir les activités
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 8+ ans -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card age-group-card border-0 shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 mb-0 text-center">8+ ans</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-rocket fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="h5 text-center mb-3">Exploration approfondie</h4>
+                        <ul class="fa-ul">
+                            <li><span class="fa-li"><i class="fas fa-check text-primary"></i></span>Programmation créative</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-primary"></i></span>Ateliers artistiques avancés</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-primary"></i></span>Projets environnementaux</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-primary"></i></span>Débats et éloquence</li>
+                            <li><span class="fa-li"><i class="fas fa-check text-primary"></i></span>Initiation aux langues étrangères</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center">
+                        <a href="#activities-grid" class="btn btn-sm btn-outline-primary" data-age-filter="8+">
+                            Voir les activités
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Témoignages -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-comments me-2"></i>Ce que disent les enfants</h2>
+                <p class="opacity-75">Découvrez les retours des enfants qui participent à nos activités</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-10 mx-auto">
+                <div class="owl-carousel testimonials-carousel">
+                    {% for testimonial in testimonials %}
+                    <div class="testimonial-item text-center p-4">
+                        <div class="testimonial-avatar mb-3 mx-auto">
+                            <img src="{{ testimonial.child.photo.url|default:'/static/images/child-avatar.png' }}" 
+                                 class="rounded-circle" 
+                                 width="80" 
+                                 height="80"
+                                 alt="{{ testimonial.child.name }}">
+                        </div>
+                        <h4 class="h5 mb-1">{{ testimonial.child.name }}</h4>
+                        <p class="mb-3 opacity-75">Âge: {{ testimonial.child.age }} ans</p>
+                        
+                        <div class="testimonial-content bg-white text-dark p-4 rounded-3 position-relative">
+                            <div class="quote-icon text-primary">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <p class="mb-0">"{{ testimonial.content }}"</p>
+                            <div class="activity-badge mt-3">
+                                <span class="badge bg-primary">{{ testimonial.activity.title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comment-dots fa-3x opacity-50 mb-3"></i>
+                        <h4>Aucun témoignage pour le moment</h4>
+                        <p class="opacity-75">Les enfants partageront bientôt leur expérience</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section FAQ -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-question-circle me-2 text-info"></i>Questions Fréquentes</h2>
+                <p class="text-muted">Trouvez des réponses aux questions les plus posées</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="accordion" id="activitiesFAQ">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Comment inscrire mon enfant à une activité ?
+                            </button>
+                        </h3>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#activitiesFAQ">
+                            <div class="accordion-body">
+                                <p>L'inscription aux activités se fait directement depuis votre espace parent :</p>
+                                <ol>
+                                    <li>Connectez-vous à votre compte</li>
+                                    <li>Accédez à la section "Activités"</li>
+                                    <li>Sélectionnez l'activité souhaitée</li>
+                                    <li>Validez l'inscription</li>
+                                </ol>
+                                <p class="mb-0">Pour les activités spéciales, une réservation préalable est nécessaire via la page de l'activité.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Les activités sont-elles incluses dans les frais de garde ?
+                            </button>
+                        </h3>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#activitiesFAQ">
+                            <div class="accordion-body">
+                                <p>La plupart de nos activités régulières sont incluses dans les frais de garde de base. Cela comprend :</p>
+                                <ul>
+                                    <li>Les activités artistiques quotidiennes</li>
+                                    <li>Les jeux éducatifs</li>
+                                    <li>Les séances de motricité</li>
+                                    <li>Les ateliers découverte</li>
+                                </ul>
+                                <p class="mb-0">Certaines activités spécialisées (robotique, musique avancée, sorties spécifiques) peuvent faire l'objet d'un supplément. Ces informations sont toujours précisées sur la fiche activité.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Que faire si mon enfant ne veut plus participer à une activité ?
+                            </button>
+                        </h3>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#activitiesFAQ">
+                            <div class="accordion-body">
+                                <p>Nous comprenons que les enfants peuvent changer d'intérêt. Voici notre politique :</p>
+                                <ul>
+                                    <li>Pour les activités hebdomadaires : possibilité de changer après un mois</li>
+                                    <li>Pour les activités ponctuelles : remboursement possible jusqu'à 48h avant</li>
+                                    <li>Nous proposons toujours une séance d'essai pour les nouvelles activités</li>
+                                </ul>
+                                <p class="mb-0">N'hésitez pas à discuter avec nos éducateurs pour trouver une activité mieux adaptée à votre enfant.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Comment sont sélectionnés les animateurs d'activités ?
+                            </button>
+                        </h3>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#activitiesFAQ">
+                            <div class="accordion-body">
+                                <p>Tous nos animateurs sont rigoureusement sélectionnés selon ces critères :</p>
+                                <ul>
+                                    <li>Diplôme dans le domaine d'activité ou expérience significative</li>
+                                    <li>Certificat de qualification en animation</li>
+                                    <li>Casier judiciaire vierge</li>
+                                    <li>Formation aux premiers secours pédiatriques</li>
+                                    <li>Test pédagogique et entretien avec notre équipe</li>
+                                </ul>
+                                <p class="mb-0">Nous renouvelons régulièrement nos formations pour garantir la qualité de nos activités.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a href="{% url 'contact' %}" class="btn btn-lg btn-primary">
+                        <i class="fas fa-question-circle me-2"></i>Autre question ? Contactez-nous
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .activities-hero {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .activity-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .activity-card {
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .activity-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .age-group-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .age-group-card:hover {
+        transform: scale(1.03);
+    }
+    
+    .testimonial-item {
+        padding: 20px;
+    }
+    
+    .testimonial-avatar {
+        position: relative;
+    }
+    
+    .testimonial-avatar::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+    }
+    
+    .testimonial-content {
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .quote-icon {
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        font-size: 2rem;
+        background: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .special-activity-item {
+        padding: 10px;
+    }
+    
+    .owl-carousel .owl-stage {
+        display: flex;
+    }
+    
+    .owl-carousel .owl-item {
+        display: flex;
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Initialisation des carrousels -->
+<script>
+$(document).ready(function(){
+    // Carrousel des activités spéciales
+    $('.special-activities-carousel').owlCarousel({
+        loop: true,
+        margin: 20,
+        nav: true,
+        dots: false,
+        responsive: {
+            0: {
+                items: 1
+            },
+            768: {
+                items: 2
+            },
+            992: {
+                items: 3
+            }
+        }
+    });
+    
+    // Carrousel des témoignages
+    $('.testimonials-carousel').owlCarousel({
+        loop: true,
+        margin: 30,
+        nav: true,
+        dots: false,
+        responsive: {
+            0: {
+                items: 1
+            },
+            768: {
+                items: 2
+            }
+        }
+    });
+    
+    // Filtrage des activités
+    function filterActivities() {
+        const searchText = $('#search-activities').val().toLowerCase();
+        const category = $('#category-filter').val();
+        const age = $('#age-filter').val();
+        
+        $('.activity-item').each(function() {
+            const item = $(this);
+            const itemCategory = item.data('category');
+            const itemAge = item.data('age');
+            const title = item.find('.card-title').text().toLowerCase();
+            
+            const matchesSearch = searchText === '' || title.includes(searchText);
+            const matchesCategory = category === 'all' || itemCategory === category;
+            const matchesAge = age === 'all' || itemAge === age;
+            
+            if (matchesSearch && matchesCategory && matchesAge) {
+                item.show();
+            } else {
+                item.hide();
+            }
+        });
+    }
+    
+    // Écouteurs d'événements pour les filtres
+    $('#search-activities, #category-filter, #age-filter').on('input change', filterActivities);
+    
+    // Filtrage par groupe d'âge depuis les cartes
+    $('[data-age-filter]').click(function(e) {
+        e.preventDefault();
+        const ageFilter = $(this).data('age-filter');
+        $('#age-filter').val(ageFilter);
+        filterActivities();
+        
+        // Scroll vers la grille d'activités
+        $('html, body').animate({
+            scrollTop: $('#activities-grid').offset().top - 100
+        }, 500);
+    });
+});
+</script>
+{% endblock %}

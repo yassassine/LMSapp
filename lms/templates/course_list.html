@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue des Cours - Garderie Scolaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-card {
+            transition: all 0.3s ease;
+            border-radius: 15px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            height: 100%;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .course-img {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .level-badge {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        
+        .course-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .stats-item i {
+            margin-right: 5px;
+        }
+        
+        .filter-card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+        
+        .filter-header {
+            background: linear-gradient(120deg, var(--accent-color), #4895ef);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .btn-apply {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+        
+        .progress-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .course-category {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .course-category:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .course-category.active {
+            background-color: rgba(67, 97, 238, 0.15);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .footer {
+            background: linear-gradient(120deg, var(--dark-color), #343a40);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .pagination .page-item .page-link {
+            border-radius: 10px;
+            margin: 0 5px;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 0;
+                border-radius: 0 0 20px 20px;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-container .btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold"><i class="fas fa-book-open me-3"></i>Catalogue des Cours</h1>
+                    <p class="lead">Découvrez nos programmes éducatifs adaptés aux enfants de 2 à 6 ans</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-inline-block bg-white p-3 rounded-pill">
+                        <i class="fas fa-child text-primary fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <div class="row">
+            <!-- Filtres -->
+            <div class="col-lg-3 mb-4">
+                <div class="filter-card">
+                    <div class="card-header filter-header">
+                        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtrer les cours</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-layer-group me-2 text-primary"></i>Catégories</h6>
+                            
+                            <!-- Section des catégories dynamique -->
+                            <div class="course-category active">
+                                <div class="course-icon" style="background-color: #4361ee;">
+                                    <i class="fas fa-palette text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">Arts Créatifs</div>
+                                    <small class="text-muted">24 cours</small>
+                                </div>
+                            </div>
+                            <div class="course-category">
+                                <div class="course-icon" style="background-color: #2ecc71;">
+                                    <i class="fas fa-leaf text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">Nature & Science</div>
+                                    <small class="text-muted">18 cours</small>
+                                </div>
+                            </div>
+                            <div class="course-category">
+                                <div class="course-icon" style="background-color: #3498db;">
+                                    <i class="fas fa-calculator text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">Mathématiques</div>
+                                    <small class="text-muted">15 cours</small>
+                                </div>
+                            </div>
+                            <div class="course-category">
+                                <div class="course-icon" style="background-color: #f39c12;">
+                                    <i class="fas fa-book text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">Lecture & Écriture</div>
+                                    <small class="text-muted">22 cours</small>
+                                </div>
+                            </div>
+                            <div class="course-category">
+                                <div class="course-icon" style="background-color: #e74c3c;">
+                                    <i class="fas fa-music text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium">Musique & Danse</div>
+                                    <small class="text-muted">12 cours</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-signal me-2 text-primary"></i>Niveau</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="level1" checked>
+                                <label class="form-check-label" for="level1">
+                                    Petits (2-3 ans)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="level2" checked>
+                                <label class="form-check-label" for="level2">
+                                    Moyens (3-4 ans)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="level3">
+                                <label class="form-check-label" for="level3">
+                                    Grands (5-6 ans)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-clock me-2 text-primary"></i>Durée</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="duration1" checked>
+                                <label class="form-check-label" for="duration1">
+                                    Court (< 30 min)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="duration2" checked>
+                                <label class="form-check-label" for="duration2">
+                                    Moyen (30-60 min)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="duration3">
+                                <label class="form-check-label" for="duration3">
+                                    Long (> 60 min)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-apply w-100 text-white">
+                            <i class="fas fa-check-circle me-2"></i>Appliquer les filtres
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card filter-card mt-4">
+                    <div class="card-header filter-header">
+                        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Votre progression</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="progress-circle bg-primary text-white" style="background: conic-gradient(var(--primary-color) 75%, #e9ecef 0);">
+                                75%
+                            </div>
+                            <div>
+                                <div class="fw-medium">Cours terminés</div>
+                                <small class="text-muted">15 sur 20 cours</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="progress-circle bg-success text-white" style="background: conic-gradient(#4caf50 40%, #e9ecef 0);">
+                                40%
+                            </div>
+                            <div>
+                                <div class="fw-medium">Badges obtenus</div>
+                                <small class="text-muted">8 sur 20 badges</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="progress-circle bg-warning text-white" style="background: conic-gradient(#ff9800 65%, #e9ecef 0);">
+                                65%
+                            </div>
+                            <div>
+                                <div class="fw-medium">Activités complétées</div>
+                                <small class="text-muted">26 sur 40 activités</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Catalogue des cours -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold">Nos cours disponibles <span class="badge bg-primary">48</span></h3>
+                    
+                    <div class="d-flex search-container">
+                        <div class="input-group me-2">
+                            <input type="text" class="form-control" placeholder="Rechercher un cours...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-sort-amount-down me-2"></i>Trier
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Cours 1 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1541692641319-981cc79ee10a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Peinture créative">
+                                <span class="category-badge" style="background-color: #4361ee;">Arts</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-info">2-4 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Peinture créative</h5>
+                                <p class="card-text">Découverte des couleurs et techniques de peinture adaptées aux tout-petits.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 45 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 12
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 8
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-primary w-100">
+                                    <i class="fas fa-plus-circle me-2"></i>Ajouter au parcours
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cours 2 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Découverte des plantes">
+                                <span class="category-badge" style="background-color: #2ecc71;">Nature</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-warning">3-5 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Découverte des plantes</h5>
+                                <p class="card-text">Initiation à la botanique et exploration du monde végétal.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 60 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 15
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 6
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-info-circle me-2"></i>Détails
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cours 3 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Chiffres amusants">
+                                <span class="category-badge" style="background-color: #3498db;">Maths</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-primary">4-6 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Chiffres amusants</h5>
+                                <p class="card-text">Apprentissage des nombres à travers des jeux interactifs.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 35 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 18
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 10
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-success w-100">
+                                    <i class="fas fa-play me-2"></i>Continuer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cours 4 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Histoire du soir">
+                                <span class="category-badge" style="background-color: #f39c12;">Lecture</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-info">2-3 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Histoire du soir</h5>
+                                <p class="card-text">Développement du langage à travers la lecture interactive.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 25 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 22
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 5
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-primary w-100">
+                                    <i class="fas fa-plus-circle me-2"></i>Ajouter au parcours
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cours 5 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Rythmes et sons">
+                                <span class="category-badge" style="background-color: #e74c3c;">Musique</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-warning">3-4 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Rythmes et sons</h5>
+                                <p class="card-text">Découverte des instruments et initiation au rythme musical.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 40 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 10
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 7
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-info-circle me-2"></i>Détails
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cours 6 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                <img src="https://images.unsplash.com/photo-1563240381-5ccf7690ca08?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80" class="course-img" alt="Formes et couleurs">
+                                <span class="category-badge" style="background-color: #4361ee;">Arts</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="level-badge bg-info">2-3 ans</span>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                                <h5 class="card-title fw-bold">Formes et couleurs</h5>
+                                <p class="card-text">Reconnaissance des formes géométriques et association des couleurs.</p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="stats-item">
+                                        <i class="fas fa-clock"></i> 30 min
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-user-friends"></i> 16
+                                    </div>
+                                    <div class="stats-item">
+                                        <i class="fas fa-play-circle"></i> 9
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <button class="btn btn-success w-100">
+                                    <i class="fas fa-check-circle me-2"></i>Terminé
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3"><i class="fas fa-school me-2"></i>Garderie Scolaire</h5>
+                    <p>Nous offrons un environnement éducatif stimulant pour les enfants de 2 à 6 ans, combinant apprentissage et jeu.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Accueil</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Programmes</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Activités</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Équipe</a></li>
+                        <li><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contactez-nous</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Rue de l'Éducation, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>contact@garderie-scolaire.fr</li>
+                        <li><i class="fas fa-clock me-2"></i>Lun-Ven: 8h00 - 18h00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Garderie Scolaire. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animation des cartes au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseCards = document.querySelectorAll('.course-card');
+            
+            courseCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = "0";
+                    card.style.transform = "translateY(20px)";
+                    card.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                    
+                    setTimeout(() => {
+                        card.style.opacity = "1";
+                        card.style.transform = "translateY(0)";
+                    }, 100);
+                }, index * 100);
+            });
+            
+            // Gestion du clic sur les catégories
+            const categories = document.querySelectorAll('.course-category');
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

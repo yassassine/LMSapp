@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mon Profil - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Carte principale du profil enfant -->
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <div class="position-relative d-inline-block">
+                        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/child-avatar.png' %}{% endif %}" 
+                             class="rounded-circle mb-3" 
+                             width="100" 
+                             height="100"
+                             alt="Ma photo">
+                        <div class="position-absolute top-0 end-0">
+                            <span class="badge bg-warning rounded-pill fs-6">⭐ Super Star ⭐</span>
+                        </div>
+                    </div>
+                    <h1 class="mb-0">{{ user.first_name }}</h1>
+                    <p class="lead mb-0">Mon espace personnel</p>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Section Informations -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h3 class="mb-0"><i class="fas fa-user-circle me-2"></i>À propos de moi</h3>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-birthday-cake me-2 text-info"></i>Âge</span>
+                                            <span class="badge bg-info rounded-pill">{{ user.get_age }} ans</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-graduation-cap me-2 text-info"></i>Niveau scolaire</span>
+                                            <span class="badge bg-success rounded-pill">{{ child.grade_level }}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-star me-2 text-info"></i>Points</span>
+                                            <span class="badge bg-warning rounded-pill">✨ {{ child.points }} points</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h3 class="mb-0"><i class="fas fa-home me-2"></i>Ma famille</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3">
+                                            <i class="fas fa-user-friends fa-2x text-success"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0">Parents : {{ child.parent.get_full_name }}</p>
+                                            <p class="mb-0">Contact : {{ child.parent.phone_number }}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-phone-alt fa-2x text-success"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0">Urgence : {{ child.emergency_contact }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Mes activités -->
+                    <div class="card border-warning mb-4">
+                        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0"><i class="fas fa-tasks me-2"></i>Mes activités</h3>
+                            <a href="{% url 'child_activities' %}" class="btn btn-sm btn-outline-dark">
+                                Voir toutes <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for activity in recent_activities %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="mb-2">
+                                                <i class="fas {{ activity.icon }} fa-2x text-primary"></i>
+                                            </div>
+                                            <h5 class="card-title">{{ activity.title }}</h5>
+                                            <p class="card-text small">{{ activity.date|date:"d/m" }}</p>
+                                            <span class="badge bg-success">{{ activity.points }} points</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-3">
+                                    <p class="mb-3"><i class="fas fa-gift fa-3x text-warning"></i></p>
+                                    <h4>Tu n'as pas encore d'activités!</h4>
+                                    <p>Participe à des activités pour gagner des points.</p>
+                                    <a href="{% url 'child_activities' %}" class="btn btn-warning">
+                                        <i class="fas fa-gamepad me-1"></i>Voir les activités
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Mes cours -->
+                    <div class="card border-danger mb-4">
+                        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0"><i class="fas fa-book me-2"></i>Mes cours</h3>
+                            <a href="{% url 'child_courses' %}" class="btn btn-sm btn-outline-light">
+                                Voir tous <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for course in courses %}
+                                <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ course.title }}</h5>
+                                            <p class="mb-0 small">
+                                                <i class="fas fa-chalkboard-teacher me-1"></i>{{ course.teacher.first_name }}
+                                                <span class="mx-2">|</span>
+                                                <i class="fas fa-calendar me-1"></i>Le {{ course.get_schedule }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary rounded-pill">{{ course.get_next_session }}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="text-center py-4">
+                                    <p class="mb-3"><i class="fas fa-book-open fa-3x text-danger"></i></p>
+                                    <h4>Tu n'as pas encore de cours!</h4>
+                                    <p>Rejoins des cours amusants pour apprendre en jouant.</p>
+                                    <a href="{% url 'child_courses' %}" class="btn btn-danger">
+                                        <i class="fas fa-search me-1"></i>Découvrir les cours
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Mes récompenses -->
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="mb-0"><i class="fas fa-trophy me-2"></i>Mes récompenses</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center flex-wrap">
+                                {% if rewards %}
+                                    {% for reward in rewards %}
+                                    <div class="m-2 text-center">
+                                        <div class="reward-badge bg-{{ reward.color }} rounded-circle p-3">
+                                            <i class="fas {{ reward.icon }} fa-2x text-white"></i>
+                                        </div>
+                                        <p class="mt-2 mb-0 fw-bold">{{ reward.title }}</p>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                <div class="text-center py-3">
+                                    <p class="mb-3"><i class="fas fa-medal fa-3x text-success"></i></p>
+                                    <h4>Tu n'as pas encore de récompenses!</h4>
+                                    <p>Complète des activités et cours pour gagner des badges.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer text-center bg-light">
+                    <p class="mb-0">Mon espace sécurisé • Garderie Scolaire</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reward-badge {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bg-yellow {
+        background-color: #FFD700;
+    }
+    .bg-blue {
+        background-color: #1E90FF;
+    }
+    .bg-purple {
+        background-color: #9370DB;
+    }
+    .list-group-item-action:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .card-header h3 {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}

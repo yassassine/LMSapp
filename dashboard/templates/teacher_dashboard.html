@@ -1,0 +1,839 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Enseignant - Garderie Scolaire</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f0f4f8;
+            --progress-bg: #e9ecef;
+            --progress-fill: #4361ee;
+            --text-light: #6c757d;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .teacher-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .teacher-info p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .stats-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .stats-card:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .stats-card .icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .stats-card .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .stats-card .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--card-bg);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--progress-bg);
+        }
+
+        .progress-bar {
+            background-color: var(--progress-fill);
+            border-radius: 5px;
+        }
+
+        .student-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-row:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+            cursor: pointer;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.4em 0.75em;
+            border-radius: 10px;
+        }
+
+        .badge-primary {
+            background-color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: #2ecc71;
+        }
+
+        .badge-warning {
+            background-color: #f39c12;
+        }
+
+        .badge-danger {
+            background-color: #e74c3c;
+        }
+
+        .badge-info {
+            background-color: var(--accent);
+        }
+
+        .activity-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-card:hover {
+            border-color: var(--accent);
+        }
+
+        .activity-image {
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .activity-content {
+            padding: 1rem;
+        }
+
+        .event-date {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .event-day {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .event-month {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 20px;
+            z-index: 1;
+        }
+
+        .sidebar-section {
+            background-color: var(--sidebar-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-title i {
+            margin-right: 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 10px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-primary {
+            border-radius: 10px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 auto 0.75rem;
+        }
+
+        .stat-circle-primary {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-circle-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .stat-circle-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .stat-circle-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .stat-circle-info {
+            background-color: rgba(72, 149, 239, 0.1);
+            color: var(--accent);
+        }
+
+        .stat-circle-secondary {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: var(--text-light);
+        }
+
+        .stat-label {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 992px) {
+            .sticky-sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="teacher-info">
+                    <h1><i class="bi bi-person-badge me-2"></i>Tableau de Bord Enseignant</h1>
+                    <p>Bienvenue, {{ teacher.get_full_name }} - {{ teacher.class_group.name }}</p>
+                </div>
+                <div class="d-flex">
+                    <div class="me-3">
+                        <div class="stats-card">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-people icon"></i>
+                                <div>
+                                    <p class="stat-value mb-0">{{ students_count }}</p>
+                                    <p class="stat-label mb-0">Élèves</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="me-3">
+                        <a href="{% url 'notifications' %}" class="stats-card text-decoration-none text-white">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-bell icon"></i>
+                                <div>
+                                    <p class="stat-value mb-0">{{ unread_notifications_count }}</p>
+                                    <p class="stat-label mb-0">Notifications</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="{% url 'assignment_list' %}" class="stats-card text-decoration-none text-white">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-journal-check icon"></i>
+                                <div>
+                                    <p class="stat-value mb-0">{{ pending_assignments_count }}</p>
+                                    <p class="stat-label mb-0">Devoirs</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+        <div class="row">
+            <!-- Section principale -->
+            <div class="col-lg-8">
+                <!-- Liste des élèves -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-people me-2"></i>Mes Élèves
+                        </div>
+                        <a href="{% url 'class_groups' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-people me-1"></i>Gérer les groupes
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Progrès</th>
+                                        <th>Dernière activité</th>
+                                        <th>Retards</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr class="student-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if student.photo %}
+                                                <img src="{{ student.photo.url }}" class="student-avatar me-3" alt="{{ student.get_full_name }}">
+                                                {% else %}
+                                                <div class="student-avatar bg-secondary d-flex align-items-center justify-content-center me-3">
+                                                    <i class="bi bi-person text-white"></i>
+                                                </div>
+                                                {% endif %}
+                                                <div>
+                                                    <strong>{{ student.get_full_name }}</strong>
+                                                    <div class="text-muted small">{{ student.parent.get_full_name }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width:  student_progress_percentage " 
+                                                         aria-valuenow="{{ student.progress_percentage }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100"></div>
+                                                </div>
+                                                <small class="text-muted">{{ student.progress_percentage }}%</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if student.last_activity %}
+                                            <div>{{ student.last_activity.title|truncatechars:20 }}</div>
+                                            <small class="text-muted">{{ student.last_activity.date|date:"d M" }}</small>
+                                            {% else %}
+                                            <span class="text-muted">Aucune</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if student.late_assignments > 0 %}bg-danger{% else %}bg-success{% endif %}">
+                                                {{ student.late_assignments }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'child_profile' student.id %}" class="btn btn-sm btn-outline-primary me-1" 
+                                               title="Voir profil">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'compose_message' %}?recipient={{ student.parent.id }}" 
+                                               class="btn btn-sm btn-outline-secondary" title="Contacter parent">
+                                                <i class="bi bi-chat"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <div class="empty-state">
+                                                <i class="bi bi-people"></i>
+                                                <h4 class="mb-2">Aucun élève assigné</h4>
+                                                <p class="text-muted">Vous n'avez aucun élève dans votre classe pour le moment</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cours et devoirs -->
+                <div class="row">
+                    <!-- Cours à venir -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-journal me-2"></i>Cours à Venir
+                                </div>
+                                <a href="{% url 'course_list' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-plus-circle me-1"></i>Tous
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    {% for course in upcoming_courses %}
+                                    <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action border-0 py-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="mb-1">{{ course.title }}</h5>
+                                                <p class="mb-0 small text-muted">{{ course.description|truncatechars:50 }}</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="text-muted d-block">{{ course.date|date:"d M" }}</small>
+                                                <small class="text-muted">{{ course.start_time|time }} - {{ course.end_time|time }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-primary me-1">{{ course.subject }}</span>
+                                            {% if course.assignment_set.exists %}
+                                            <span class="badge bg-info">
+                                                <i class="bi bi-journal-check me-1"></i>Devoir
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                    {% empty %}
+                                    <div class="list-group-item text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="bi bi-calendar-plus"></i>
+                                            <h4 class="mb-2">Aucun cours prévu</h4>
+                                            <p class="text-muted">Aucun cours n'est prévu pour les prochains jours</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Devoirs à corriger -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-journal-check me-2"></i>Devoirs à Corriger
+                                </div>
+                                <a href="{% url 'assignment_list' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-journals me-1"></i>Tous
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    {% for assignment in pending_assignments %}
+                                    <a href="{% url 'assignment_submissions' assignment.id %}" class="list-group-item list-group-item-action border-0 py-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="mb-1">{{ assignment.title }}</h5>
+                                                <p class="mb-0 small text-muted">Pour: {{ assignment.course.title }}</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="text-muted d-block">Date limite: {{ assignment.due_date|date:"d M" }}</small>
+                                                <span class="badge bg-warning">
+                                                    {{ assignment.pending_count }} non corrigés
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: assignment_submission_percentage "></div>
+                                                </div>
+                                                <small>{{ assignment.submission_percentage }}% rendus</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% empty %}
+                                    <div class="list-group-item text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="bi bi-check-circle"></i>
+                                            <h4 class="mb-2">Aucun devoir à corriger</h4>
+                                            <p class="text-muted">Tous les devoirs ont été corrigés</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activités récentes -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-activity me-2"></i>Activités Récentes
+                        </div>
+                        <a href="{% url 'create_activity' %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Nouvelle activité
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for activity in recent_activities %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card activity-card h-100">
+                                    {% if activity.image %}
+                                    <img src="{{ activity.image.url }}" class="card-img-top activity-image" alt="{{ activity.title }}">
+                                    {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 140px;">
+                                        <i class="bi bi-image text-muted fs-1"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="activity-content">
+                                        <h3 class="h6 card-title mb-2">{{ activity.title }}</h3>
+                                        <p class="card-text small text-muted mb-3">
+                                            {{ activity.description|truncatechars:80 }}
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">{{ activity.category }}</span>
+                                            <small class="text-muted">{{ activity.date|date:"d M Y" }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        <a href="{% url 'activity_detail' activity.id %}" class="btn btn-sm btn-outline-primary w-100">
+                                            Voir détails
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="empty-state py-5">
+                                    <i class="bi bi-activity"></i>
+                                    <h4 class="mb-2">Aucune activité récente</h4>
+                                    <p class="text-muted">Aucune activité n'a été créée pour le moment</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Barre latérale -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar">
+                    <!-- Statistiques de classe -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-graph-up me-2"></i>Statistiques de Classe
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-4 mb-4">
+                                    <div class="stat-circle stat-circle-primary">
+                                        {{ class_stats.avg_progress }}%
+                                    </div>
+                                    <div class="stat-label">Progrès moyen</div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="stat-circle stat-circle-success">
+                                        {{ class_stats.completed_assignments }}
+                                    </div>
+                                    <div class="stat-label">Devoirs complétés</div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="stat-circle stat-circle-danger">
+                                        {{ class_stats.late_assignments }}
+                                    </div>
+                                    <div class="stat-label">Retards</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-circle stat-circle-info">
+                                        {{ class_stats.activities_count }}
+                                    </div>
+                                    <div class="stat-label">Activités</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-circle stat-circle-warning">
+                                        {{ class_stats.pending_corrections }}
+                                    </div>
+                                    <div class="stat-label">À corriger</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-circle stat-circle-secondary">
+                                        {{ class_stats.absences }}
+                                    </div>
+                                    <div class="stat-label">Absences</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Événements à venir -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-calendar-event me-2"></i>Événements à Venir
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for event in upcoming_events %}
+                                <a href="{% url 'event_detail' event.id %}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="event-date me-3">
+                                            <div class="event-day">{{ event.date|date:"d" }}</div>
+                                            <div class="event-month">{{ event.date|date:"M"|upper }}</div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">{{ event.title }}</h5>
+                                            <p class="mb-0 small text-muted">
+                                                <i class="bi bi-clock me-1"></i> {{ event.start_time|time }} - {{ event.end_time|time }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="empty-state py-4">
+                                    <i class="bi bi-calendar-x"></i>
+                                    <h4 class="mb-2">Aucun événement</h4>
+                                    <p class="text-muted">Aucun événement à venir pour votre classe</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white text-center">
+                            <a href="{% url 'create_event' %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-plus-circle me-1"></i>Créer
+                            </a>
+                            <a href="{% url 'events' %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-calendar-check me-1"></i>Tous
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Derniers messages des parents -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-chat-dots me-2"></i>Messages des Parents
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for message in recent_parent_messages %}
+                                <a href="{% url 'message_detail' message.id %}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            {% if message.sender.photo %}
+                                            <img src="{{ message.sender.photo.url }}" class="message-avatar" alt="{{ message.sender.get_full_name }}">
+                                            {% else %}
+                                            <div class="message-avatar bg-secondary d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="mb-1">{{ message.sender.get_full_name }}</h5>
+                                                <small class="text-muted">{{ message.sent_at|timesince }}</small>
+                                            </div>
+                                            <p class="mb-0 small text-truncate">{{ message.subject }}</p>
+                                            {% if not message.is_read %}
+                                            <span class="badge bg-danger float-end mt-1">Nouveau</span>
+                                            {% endif %}
+                                            <small class="text-muted d-block mt-1">
+                                                Enfant: {{ message.student.get_full_name }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="empty-state py-4">
+                                    <i class="bi bi-envelope-open"></i>
+                                    <h4 class="mb-2">Aucun message</h4>
+                                    <p class="text-muted">Aucun message de parent récent</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white text-center">
+                            <a href="{% url 'compose_message' %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil me-1"></i>Répondre
+                            </a>
+                            <a href="{% url 'inbox' %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-inbox me-1"></i>Boîte de réception
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation pour les éléments statistiques
+            const statCircles = document.querySelectorAll('.stat-circle');
+            statCircles.forEach(circle => {
+                circle.style.opacity = '0';
+                circle.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    circle.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    circle.style.opacity = '1';
+                    circle.style.transform = 'scale(1)';
+                }, 300);
+            });
+            
+            // Animation pour les cartes
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                    card.style.transitionDelay = `${index * 0.1}s`;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

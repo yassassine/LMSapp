@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activités Pédagogiques - Garderie Scolaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --math-color: #ff6b6b;
+            --language-color: #1dd1a1;
+            --art-color: #ff9ff3;
+            --science-color: #54a0ff;
+            --music-color: #feca57;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23ffffff20' /%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z' fill='%23ffffff20' /%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+        
+        .activity-card {
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            position: relative;
+            background: white;
+            transform-style: preserve-3d;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-10px) rotate(2deg) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            z-index: 2;
+        }
+        
+        .activity-card.math {
+            border-top: 8px solid var(--math-color);
+        }
+        
+        .activity-card.language {
+            border-top: 8px solid var(--language-color);
+        }
+        
+        .activity-card.art {
+            border-top: 8px solid var(--art-color);
+        }
+        
+        .activity-card.science {
+            border-top: 8px solid var(--science-color);
+        }
+        
+        .activity-card.music {
+            border-top: 8px solid var(--music-color);
+        }
+        
+        .activity-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .math .activity-icon {
+            background: var(--math-color);
+            color: white;
+        }
+        
+        .language .activity-icon {
+            background: var(--language-color);
+            color: white;
+        }
+        
+        .art .activity-icon {
+            background: var(--art-color);
+            color: white;
+        }
+        
+        .science .activity-icon {
+            background: var(--science-color);
+            color: white;
+        }
+        
+        .music .activity-icon {
+            background: var(--music-color);
+            color: white;
+        }
+        
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+        
+        .math .category-badge {
+            background: var(--math-color);
+            color: white;
+        }
+        
+        .language .category-badge {
+            background: var(--language-color);
+            color: white;
+        }
+        
+        .art .category-badge {
+            background: var(--art-color);
+            color: white;
+        }
+        
+        .science .category-badge {
+            background: var(--science-color);
+            color: white;
+        }
+        
+        .music .category-badge {
+            background: var(--music-color);
+            color: white;
+        }
+        
+        .progress-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn-play {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-play::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+        
+        .btn-play:hover::after {
+            transform: translateX(100%) rotate(30deg);
+        }
+        
+        .math .btn-play {
+            background: var(--math-color);
+            color: white;
+        }
+        
+        .language .btn-play {
+            background: var(--language-color);
+            color: white;
+        }
+        
+        .art .btn-play {
+            background: var(--art-color);
+            color: white;
+        }
+        
+        .science .btn-play {
+            background: var(--science-color);
+            color: white;
+        }
+        
+        .music .btn-play {
+            background: var(--music-color);
+            color: white;
+        }
+        
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            z-index: 0;
+        }
+        
+        .bubble-1 {
+            top: 10%;
+            left: 5%;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .bubble-2 {
+            top: 20%;
+            right: 10%;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .bubble-3 {
+            bottom: 15%;
+            left: 15%;
+            width: 25px;
+            height: 25px;
+        }
+        
+        .bubble-4 {
+            bottom: 25%;
+            right: 20%;
+            width: 35px;
+            height: 35px;
+        }
+        
+        .child-selector {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .child-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .category-filter {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .filter-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .filter-btn.math {
+            background: var(--math-color);
+        }
+        
+        .filter-btn.language {
+            background: var(--language-color);
+        }
+        
+        .filter-btn.art {
+            background: var(--art-color);
+        }
+        
+        .filter-btn.science {
+            background: var(--science-color);
+        }
+        
+        .filter-btn.music {
+            background: var(--music-color);
+        }
+        
+        .progress-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        
+        .progress-bar-custom {
+            height: 15px;
+            border-radius: 10px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .trophy {
+            font-size: 3rem;
+            color: #ffd700;
+            text-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            background: linear-gradient(120deg, #2c3e50, #34495e);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 0;
+                border-radius: 0 0 20px 20px;
+            }
+            
+            .activity-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 position-relative">
+                    <h1 class="display-4 fw-bold"><i class="fas fa-puzzle-piece me-3"></i>Activités Pédagogiques</h1>
+                    <p class="lead">Jeux éducatifs et amusants pour apprendre en s'amusant!</p>
+                    <div class="mt-4">
+                        <div class="d-inline-block bg-white p-3 rounded-pill me-3">
+                            <i class="fas fa-gamepad fa-2x text-primary"></i>
+                        </div>
+                        <div class="d-inline-block bg-white p-3 rounded-pill me-3">
+                            <i class="fas fa-paint-brush fa-2x text-danger"></i>
+                        </div>
+                        <div class="d-inline-block bg-white p-3 rounded-pill">
+                            <i class="fas fa-music fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end position-relative">
+                    <img src="https://images.unsplash.com/photo-1590005024862-6b67679a29fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="rounded-circle border border-4 border-white shadow floating" width="150" alt="Enfant jouant">
+                </div>
+            </div>
+        </div>
+        <div class="bubble bubble-1"></div>
+        <div class="bubble bubble-2"></div>
+        <div class="bubble bubble-3"></div>
+        <div class="bubble bubble-4"></div>
+    </header>
+
+    <div class="container mb-5">
+        <div class="row">
+            <!-- Filtres et profil enfant -->
+            <div class="col-lg-3">
+                <!-- Sélection de l'enfant -->
+                <div class="child-selector">
+                    <h3 class="fw-bold mb-4 text-center"><i class="fas fa-child me-2"></i>Qui joue?</h3>
+                    <div class="text-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="child-avatar mb-3" alt="Lucas">
+                        <h4 class="fw-bold mb-1">Lucas Dubois</h4>
+                        <p class="text-muted mb-0">5 ans - Moyenne Section</p>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-sync-alt me-2"></i>Changer d'enfant
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filtres par catégorie -->
+                <div class="category-filter">
+                    <h3 class="fw-bold mb-4 text-center"><i class="fas fa-filter me-2"></i>Catégories</h3>
+                    <div class="filter-btn math active">
+                        <i class="fas fa-calculator me-2"></i>Mathématiques
+                    </div>
+                    <div class="filter-btn language">
+                        <i class="fas fa-book me-2"></i>Langage
+                    </div>
+                    <div class="filter-btn art">
+                        <i class="fas fa-paint-brush me-2"></i>Arts
+                    </div>
+                    <div class="filter-btn science">
+                        <i class="fas fa-flask me-2"></i>Science
+                    </div>
+                    <div class="filter-btn music">
+                        <i class="fas fa-music me-2"></i>Musique
+                    </div>
+                    <div class="filter-btn" style="background: #6c757d;">
+                        <i class="fas fa-star me-2"></i>Toutes les activités
+                    </div>
+                </div>
+                
+                <!-- Progression -->
+                <div class="progress-card">
+                    <h3 class="fw-bold mb-4 text-center"><i class="fas fa-trophy me-2"></i>Progression</h3>
+                    <div class="text-center mb-4">
+                        <div class="trophy">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h4 class="fw-bold">15 Étoiles</h4>
+                        <p class="text-muted">Continue comme ça!</p>
+                    </div>
+                    
+                    <h5 class="fw-bold"><i class="fas fa-calculator me-2"></i>Mathématiques</h5>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Progression</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="progress-bar-custom mb-3">
+                        <div class="progress-fill" style="width: 75%; background: var(--math-color);"></div>
+                    </div>
+                    
+                    <h5 class="fw-bold"><i class="fas fa-book me-2"></i>Langage</h5>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Progression</span>
+                        <span>60%</span>
+                    </div>
+                    <div class="progress-bar-custom mb-3">
+                        <div class="progress-fill" style="width: 60%; background: var(--language-color);"></div>
+                    </div>
+                    
+                    <h5 class="fw-bold"><i class="fas fa-paint-brush me-2"></i>Arts</h5>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Progression</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 85%; background: var(--art-color);"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grille d'activités -->
+            <div class="col-lg-9">
+                <div class="row">
+                    <!-- Activité 1 - Mathématiques -->
+                    <div class="col-md-6 col-lg-4 activity-card math">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Mathématiques</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Chasse aux nombres</h3>
+                            <p class="mb-4">Trouve les nombres cachés dans l'image et compte les objets!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--math-color) 75%, #e9ecef 0);">
+                                75%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 3/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 10 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer maintenant
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 2 - Langage -->
+                    <div class="col-md-6 col-lg-4 activity-card language">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Langage</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Mots Cachés</h3>
+                            <p class="mb-4">Trouve les mots cachés dans la grille de lettres!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--language-color) 60%, #e9ecef 0);">
+                                60%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 2/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 8 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer maintenant
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 3 - Arts -->
+                    <div class="col-md-6 col-lg-4 activity-card art">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Arts</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Atelier de Peinture</h3>
+                            <p class="mb-4">Crée ton propre chef-d'œuvre avec des couleurs magiques!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--art-color) 85%, #e9ecef 0);">
+                                85%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 4/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 15 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer maintenant
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 4 - Science -->
+                    <div class="col-md-6 col-lg-4 activity-card science">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Science</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Explorateur Nature</h3>
+                            <p class="mb-4">Découvre les plantes et les animaux de la forêt!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--science-color) 40%, #e9ecef 0);">
+                                40%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 1/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 12 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer maintenant
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 5 - Musique -->
+                    <div class="col-md-6 col-lg-4 activity-card music">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Musique</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Orchestre Enfantin</h3>
+                            <p class="mb-4">Crée ta propre musique avec des instruments virtuels!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--music-color) 65%, #e9ecef 0);">
+                                65%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 3/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 10 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer maintenant
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 6 - Mathématiques -->
+                    <div class="col-md-6 col-lg-4 activity-card math">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Mathématiques</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-shapes"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Formes Géométriques</h3>
+                            <p class="mb-4">Apprends les formes et crée des motifs colorés!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--math-color) 90%, #e9ecef 0);">
+                                90%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 5/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 7 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Rejouer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 7 - Langage -->
+                    <div class="col-md-6 col-lg-4 activity-card language">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Langage</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Histoire Interactive</h3>
+                            <p class="mb-4">Choisis ton aventure dans cette histoire magique!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--language-color) 30%, #e9ecef 0);">
+                                30%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 1/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 15 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Commencer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 8 - Science -->
+                    <div class="col-md-6 col-lg-4 activity-card science">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Science</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Météo Magique</h3>
+                            <p class="mb-4">Découvre les phénomènes météorologiques amusants!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--science-color) 20%, #e9ecef 0);">
+                                20%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 1/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 10 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Commencer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activité 9 - Musique -->
+                    <div class="col-md-6 col-lg-4 activity-card music">
+                        <div class="bubble bubble-1"></div>
+                        <div class="bubble bubble-2"></div>
+                        <div class="card-body text-center">
+                            <span class="category-badge">Musique</span>
+                            <div class="activity-icon pulse">
+                                <i class="fas fa-drum"></i>
+                            </div>
+                            <h3 class="fw-bold mb-3">Rythmes Enfantins</h3>
+                            <p class="mb-4">Crée des rythmes amusants avec des instruments de percussion!</p>
+                            
+                            <div class="progress-circle" style="background: conic-gradient(var(--music-color) 50%, #e9ecef 0);">
+                                50%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-star text-warning"></i> 2/5
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock text-primary"></i> 8 min
+                                </span>
+                            </div>
+                            
+                            <button class="btn-play">
+                                <i class="fas fa-play me-2"></i>Jouer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3"><i class="fas fa-school me-2"></i>Garderie Scolaire</h5>
+                    <p>Nous offrons un environnement éducatif stimulant pour les enfants de 2 à 6 ans, combinant apprentissage et jeu.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Accueil</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Activités</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Cours</a></li>
+                        <li class="mb-2"><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Devoirs</a></li>
+                        <li><a href="#" class="text-white"><i class="fas fa-angle-right me-2"></i>Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contactez-nous</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Rue de l'Éducation, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>contact@garderie-scolaire.fr</li>
+                        <li><i class="fas fa-clock me-2"></i>Lun-Ven: 8h00 - 18h00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Garderie Scolaire. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation des cartes au chargement
+            const cards = document.querySelectorAll('.activity-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = "0";
+                    card.style.transform = "translateY(30px) rotate(5deg)";
+                    card.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                    
+                    setTimeout(() => {
+                        card.style.opacity = "1";
+                        card.style.transform = "translateY(0) rotate(0)";
+                    }, 100);
+                }, index * 150);
+            });
+            
+            // Filtrage par catégorie
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Retirer la classe active de tous les boutons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // Ajouter la classe active au bouton cliqué
+                    this.classList.add('active');
+                    
+                    // Récupérer la catégorie
+                    const category = this.classList[1] || 'all';
+                    
+                    // Filtrer les cartes
+                    cards.forEach(card => {
+                        if (category === 'all' || card.classList.contains(category)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Animation des boutons "Jouer"
+            const playBtns = document.querySelectorAll('.btn-play');
+            
+            playBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Animation de clic
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Chargement...';
+                    this.disabled = true;
+                    
+                    // Simuler le chargement d'une activité
+                    setTimeout(() => {
+                        alert("L'activité se lance! Amuse-toi bien!");
+                        this.innerHTML = '<i class="fas fa-play me-2"></i> Jouer maintenant';
+                        this.disabled = false;
+                    }, 1500);
+                });
+            });
+            
+            // Bulles animées dans le header
+            const bubbles = document.querySelectorAll('.bubble');
+            
+            function animateBubbles() {
+                bubbles.forEach(bubble => {
+                    // Animation aléatoire
+                    const duration = 15 + Math.random() * 10;
+                    const delay = Math.random() * 5;
+                    const sizeChange = 10 + Math.random() * 20;
+                    
+                    bubble.style.transition = `all ${duration}s ease ${delay}s`;
+                    bubble.style.transform = `translate(${Math.random() * 100}px, ${Math.random() * 100}px) scale(${1 + sizeChange/100})`;
+                });
+                
+                // Répéter l'animation
+                setTimeout(animateBubbles, 15000);
+            }
+            
+            animateBubbles();
+        });
+    </script>
+</body>
+</html>

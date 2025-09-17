@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Envoyer un message - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-send me-2"></i>Nouveau message
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Destinataires -->
+                        <div class="mb-3">
+                            <label for="recipient" class="form-label fw-bold">
+                                Destinataire(s) <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="recipient" name="recipient" required multiple>
+                                <option value="" disabled>Sélectionnez un ou plusieurs destinataires</option>
+                                {% for teacher in teachers %}
+                                <option value="teacher_{{ teacher.id }}">Enseignant: {{ teacher.get_full_name }}</option>
+                                {% endfor %}
+                                {% for parent in parents %}
+                                <option value="parent_{{ parent.id }}">Parent: {{ parent.get_full_name }}</option>
+                                {% endfor %}
+                                {% for group in groups %}
+                                <option value="group_{{ group.id }}">Groupe: {{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Maintenez Ctrl/Cmd pour sélectionner plusieurs destinataires</div>
+                        </div>
+                        
+                        <!-- Sujet -->
+                        <div class="mb-3">
+                            <label for="subject" class="form-label fw-bold">
+                                Sujet <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="subject" name="subject" 
+                                   placeholder="Objet du message" required>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label fw-bold">
+                                Message <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="content" name="content" 
+                                      rows="8" placeholder="Écrivez votre message ici..." required></textarea>
+                        </div>
+                        
+                        <!-- Pièce jointe -->
+                        <div class="mb-4">
+                            <label for="attachment" class="form-label fw-bold">
+                                <i class="bi bi-paperclip me-1"></i>Pièce jointe
+                            </label>
+                            <input class="form-control" type="file" id="attachment" name="attachment">
+                            <div class="form-text">Formats acceptés: PDF, JPG, PNG (max 5MB)</div>
+                        </div>
+                        
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
+                                <i class="bi bi-x-circle me-1"></i>Annuler
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i>Envoyer le message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Rappel de confidentialité -->
+            <div class="alert alert-info mt-4">
+                <h3 class="h6"><i class="bi bi-shield-lock me-2"></i>Confidentialité des messages</h3>
+                <p class="mb-0">
+                    Tous les messages sont cryptés et conservés de manière sécurisée conformément à 
+                    notre politique de confidentialité et aux réglementations RGPD.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialisation des sélecteurs améliorés
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation de Select2 si disponible
+    if (typeof $ !== 'undefined' && $.fn.select2) {
+        $('#recipient').select2({
+            placeholder: "Sélectionnez des destinataires",
+            allowClear: true
+        });
+    }
+    
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const recipient = document.getElementById('recipient');
+        if (recipient.selectedOptions.length === 0) {
+            alert('Veuillez sélectionner au moins un destinataire');
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

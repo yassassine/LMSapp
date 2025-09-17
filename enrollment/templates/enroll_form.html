@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Formulaire d'Inscription - Garderie Scolaire
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="enrollmentForm" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Section Informations Enfant -->
+                        <fieldset class="mb-4">
+                            <legend class="border-bottom pb-2">
+                                <i class="fas fa-child me-2"></i>Informations de l'Enfant
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.child_first_name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.child_last_name|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {{ form.birth_date|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.gender|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.grade_level|as_crispy_field }}
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section Santé -->
+                        <fieldset class="mb-4">
+                            <legend class="border-bottom pb-2">
+                                <i class="fas fa-heartbeat me-2"></i>Informations Médicales
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.allergies|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.medical_conditions|as_crispy_field }}
+                                </div>
+                            </div>
+                            <!-- Champ certificat médical intégré via crispy forms -->
+                            <div class="mb-3">
+                                {{ form.medical_certificate|as_crispy_field }}
+                            </div>
+                        </fieldset>
+
+                        <!-- Section Garde -->
+                        <fieldset class="mb-4">
+                            <legend class="border-bottom pb-2">
+                                <i class="fas fa-clock me-2"></i>Préférences de Garde
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.schedule_type|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.start_date|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                {{ form.special_requirements|as_crispy_field }}
+                            </div>
+                        </fieldset>
+
+                        <!-- Section Contacts d'Urgence -->
+                        <fieldset class="mb-4">
+                            <legend class="border-bottom pb-2">
+                                <i class="fas fa-phone-alt me-2"></i>Contacts d'Urgence
+                            </legend>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form.emergency_contact_name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.emergency_contact_phone|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.emergency_contact_relation|as_crispy_field }}
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">conditions générales</a>
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-eraser me-1"></i>Réinitialiser
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane me-1"></i>Soumettre l'inscription
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Conditions Générales -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conditions Générales d'Inscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenu des conditions à remplir -->
+                <p>Texte des conditions générales...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validation en temps réel de la date de naissance
+    document.getElementById('id_birth_date').addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        
+        if (age < 2 || age > 6) {
+            alert("L'âge doit être compris entre 2 et 6 ans pour l'inscription");
+            this.value = '';
+        }
+    });
+
+    // Affichage dynamique des champs médicaux
+    document.getElementById('id_allergies').addEventListener('change', function() {
+        const medicalSection = document.getElementById('medicalDetails');
+        if (this.value !== 'Aucune') {
+            medicalSection.classList.remove('d-none');
+        } else {
+            medicalSection.classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}

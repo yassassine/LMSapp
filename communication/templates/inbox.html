@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messagerie - Garderie Scolaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #00d2ff;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+        }
+        
+        .inbox-container {
+            display: flex;
+            min-height: 80vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9fbfd;
+        }
+        
+        .compose-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .folder-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .folder-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover, .folder-item.active {
+            background-color: #e6f0ff;
+            color: var(--primary-color);
+        }
+        
+        .folder-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .message-count {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+        }
+        
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            transition: all 0.2s;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .message-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .message-item.unread {
+            background-color: #f0f8ff;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .message-checkbox {
+            margin-right: 15px;
+        }
+        
+        .message-sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .message-subject {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .message-preview {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .message-time {
+            color: #6c757d;
+            font-size: 0.85rem;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .message-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 10px 0;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .message-detail {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .message-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .message-subject-detail {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #6c757d;
+        }
+        
+        .message-recipients {
+            margin-top: 5px;
+        }
+        
+        .message-body {
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        
+        .attachment-list {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .attachment-icon {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .message-actions-detail {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-action {
+            border-radius: 20px;
+            padding: 8px 16px;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: all 0.3s;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button class="mobile-menu-btn me-3">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><i class="fas fa-envelope me-2"></i>Messagerie</h1>
+                </div>
+                <div>
+                    <button class="btn btn-light"><i class="fas fa-cog"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="inbox-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <button class="compose-btn">
+                    <i class="fas fa-plus me-2"></i>Nouveau message
+                </button>
+                
+                <ul class="folder-list">
+                    <li class="folder-item active">
+                        <i class="fas fa-inbox"></i> Boîte de réception
+                        <span class="message-count">12</span>
+                    </li>
+                    <li class="folder-item">
+                        <i class="fas fa-paper-plane"></i> Envoyés
+                        <span class="message-count">8</span>
+                    </li>
+                    <li class="folder-item">
+                        <i class="fas fa-star"></i> Favoris
+                        <span class="message-count">3</span>
+                    </li>
+                    <li class="folder-item">
+                        <i class="fas fa-exclamation-circle"></i> Importants
+                    </li>
+                    <li class="folder-item">
+                        <i class="fas fa-clock"></i> Brouillons
+                    </li>
+                    <li class="folder-item">
+                        <i class="fas fa-trash-alt"></i> Corbeille
+                    </li>
+                </ul>
+                
+                <h6 class="mt-4 mb-3">Contacts fréquents</h6>
+                <ul class="folder-list">
+                    <li class="folder-item">
+                        <div class="message-sender-avatar">M</div>
+                        Marie Dubois
+                    </li>
+                    <li class="folder-item">
+                        <div class="message-sender-avatar">P</div>
+                        Paul Martin
+                    </li>
+                    <li class="folder-item">
+                        <div class="message-sender-avatar">E</div>
+                        Équipe pédagogique
+                    </li>
+                    <li class="folder-item">
+                        <div class="message-sender-avatar">A</div>
+                        Administration
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Overlay for mobile -->
+            <div class="overlay"></div>
+            
+            <!-- Message Area -->
+            <div class="content-area">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-inbox me-2"></i>Boîte de réception</h2>
+                    <div class="d-flex">
+                        <div class="input-group me-2" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Rechercher dans les messages...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Message List -->
+                <ul class="message-list">
+                    <!-- Unread Message -->
+                    <li class="message-item unread">
+                        <div class="message-checkbox">
+                            <input type="checkbox" class="form-check-input">
+                        </div>
+                        <div class="message-sender-avatar">M</div>
+                        <div class="message-content">
+                            <div class="message-sender">Marie Dubois (Enseignante)</div>
+                            <div class="message-subject">Sortie pédagogique de jeudi</div>
+                            <div class="message-preview">Bonjour, je vous informe que la sortie au musée prévue jeudi prochain nécessite une autorisation signée. Merci de...</div>
+                        </div>
+                        <div class="message-time">
+                            <div>10:45</div>
+                            <div class="mt-1"><i class="fas fa-paperclip"></i></div>
+                        </div>
+                    </li>
+                    
+                    <!-- Important Message -->
+                    <li class="message-item">
+                        <div class="message-checkbox">
+                            <input type="checkbox" class="form-check-input">
+                        </div>
+                        <div class="message-sender-avatar">A</div>
+                        <div class="message-content">
+                            <div class="message-sender">Administration</div>
+                            <div class="message-subject">Important : Changement d'horaire</div>
+                            <div class="message-preview">Chers parents, veuillez noter que les horaires de la garderie seront modifiés à partir du 15 juin en raison...</div>
+                        </div>
+                        <div class="message-time">
+                            <div>Hier</div>
+                            <div class="mt-1"><i class="fas fa-star text-warning"></i></div>
+                        </div>
+                    </li>
+                    
+                    <!-- Message with Attachment -->
+                    <li class="message-item">
+                        <div class="message-checkbox">
+                            <input type="checkbox" class="form-check-input">
+                        </div>
+                        <div class="message-sender-avatar">P</div>
+                        <div class="message-content">
+                            <div class="message-sender">Paul Martin</div>
+                            <div class="message-subject">Photos de l'atelier peinture</div>
+                            <div class="message-preview">Bonjour, je vous envoie les photos de notre atelier peinture de la semaine dernière. Les enfants ont créé de...</div>
+                        </div>
+                        <div class="message-time">
+                            <div>Mar 12</div>
+                            <div class="mt-1"><i class="fas fa-paperclip"></i></div>
+                        </div>
+                    </li>
+                    
+                    <!-- Parent-Teacher Meeting -->
+                    <li class="message-item">
+                        <div class="message-checkbox">
+                            <input type="checkbox" class="form-check-input">
+                        </div>
+                        <div class="message-sender-avatar">E</div>
+                        <div class="message-content">
+                            <div class="message-sender">Équipe pédagogique</div>
+                            <div class="message-subject">Réunion parents-enseignants</div>
+                            <div class="message-preview">Chers parents, nous vous convions à la réunion trimestrielle qui aura lieu le 25 juin à 18h dans la salle...</div>
+                        </div>
+                        <div class="message-time">
+                            <div>Lun 11</div>
+                        </div>
+                    </li>
+                    
+                    <!-- Child Progress -->
+                    <li class="message-item">
+                        <div class="message-checkbox">
+                            <input type="checkbox" class="form-check-input">
+                        </div>
+                        <div class="message-sender-avatar">M</div>
+                        <div class="message-content">
+                            <div class="message-sender">Marie Dubois (Enseignante)</div>
+                            <div class="message-subject">Progrès de Lucas</div>
+                            <div class="message-preview">Bonjour, je tenais à vous informer des excellents progrès de Lucas en mathématiques cette semaine. Il a...</div>
+                        </div>
+                        <div class="message-time">
+                            <div>Dim 10</div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- Message Detail View -->
+                <div class="message-detail mt-4">
+                    <div class="message-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h2 class="message-subject-detail">Sortie pédagogique de jeudi</h2>
+                                <div class="message-meta">
+                                    <div>
+                                        <span class="message-sender">Marie Dubois (Enseignante)</span>
+                                        <span class="text-muted">à</span>
+                                        <span class="message-recipients">Moi</span>
+                                    </div>
+                                    <div class="message-time">Aujourd'hui, 10:45</div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-secondary"><i class="fas fa-star"></i></button>
+                                <button class="btn btn-outline-secondary"><i class="fas fa-reply"></i></button>
+                                <button class="btn btn-outline-secondary"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message-body">
+                        <p>Bonjour,</p>
+                        
+                        <p>Je vous informe que la sortie pédagogique au Musée des Sciences, prévue ce jeudi 22 juin, nécessite une autorisation parentale signée.</p>
+                        
+                        <p>Merci de bien vouloir remplir le formulaire d'autorisation joint à ce message et de le retourner signé avant mercredi.</p>
+                        
+                        <p>Informations pratiques :</p>
+                        <ul>
+                            <li>Départ : 9h00 de la garderie</li>
+                            <li>Retour prévu : 16h30</li>
+                            <li>Repas : Prévoir un pique-nique et une bouteille d'eau</li>
+                            <li>Tenue : Vêtements confortables et chaussures de marche</li>
+                        </ul>
+                        
+                        <p>Cette sortie s'inscrit dans notre projet pédagogique sur "La découverte de l'environnement". Les enfants participeront à un atelier sur le recyclage et visiteront l'exposition interactive sur les écosystèmes.</p>
+                        
+                        <p>N'hésitez pas à me contacter si vous avez des questions.</p>
+                        
+                        <p>Cordialement,</p>
+                        <p>Marie Dubois<br>
+                        Enseignante principale<br>
+                        Garderie Scolaire Les Petits Explorateurs</p>
+                    </div>
+                    
+                    <div class="attachment-list">
+                        <h5><i class="fas fa-paperclip me-2"></i>Pièces jointes</h5>
+                        <div class="attachment-item">
+                            <div class="attachment-icon">
+                                <i class="fas fa-file-pdf fa-lg"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Autorisation_sortie_musee.pdf</div>
+                                <div class="text-muted">1.2 MB</div>
+                            </div>
+                            <div class="ms-auto">
+                                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="attachment-item">
+                            <div class="attachment-icon">
+                                <i class="fas fa-file-word fa-lg"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Info_pratiques_sortie.docx</div>
+                                <div class="text-muted">350 KB</div>
+                            </div>
+                            <div class="ms-auto">
+                                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message-actions-detail">
+                        <button class="btn btn-primary btn-action">
+                            <i class="fas fa-reply me-1"></i> R&eacute;pondre
+                        </button>
+                        <button class="btn btn-outline-primary btn-action">
+                            <i class="fas fa-reply-all me-1"></i> R&eacute;pondre à tous
+                        </button>
+                        <button class="btn btn-outline-secondary btn-action">
+                            <i class="fas fa-share me-1"></i> Transférer
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile sidebar toggle
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking overlay
+        document.querySelector('.overlay').addEventListener('click', function() {
+            this.classList.remove('active');
+            document.querySelector('.sidebar').classList.remove('active');
+        });
+        
+        // Toggle message selection
+        const checkboxes = document.querySelectorAll('.message-checkbox input');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const messageItem = this.closest('.message-item');
+                if (this.checked) {
+                    messageItem.classList.add('selected');
+                } else {
+                    messageItem.classList.remove('selected');
+                }
+            });
+        });
+        
+        // Folder selection
+        const folderItems = document.querySelectorAll('.folder-item');
+        folderItems.forEach(item => {
+            item.addEventListener('click', function() {
+                folderItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

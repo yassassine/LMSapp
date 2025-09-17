@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Annonces Officielles - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- En-tête avec bouton de création -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">
+                <i class="bi bi-megaphone me-2 text-primary"></i>Annonces Officielles
+            </h1>
+            <p class="text-muted">Restez informé des dernières nouvelles et mises à jour de la garderie</p>
+        </div>
+        
+        {% if user.role == 'ADMIN' or user.role == 'TEACHER' %}
+        <div>
+            <a href="{% url 'create_announcement' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Créer une annonce
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{% url 'announcements' %}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="category" class="form-label">Catégorie</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="all" {% if request.GET.category == 'all' %}selected{% endif %}>Toutes les catégories</option>
+                            <option value="info" {% if request.GET.category == 'info' %}selected{% endif %}>Informations générales</option>
+                            <option value="event" {% if request.GET.category == 'event' %}selected{% endif %}>Événements</option>
+                            <option value="academic" {% if request.GET.category == 'academic' %}selected{% endif %}>Pédagogie</option>
+                            <option value="emergency" {% if request.GET.category == 'emergency' %}selected{% endif %}>Urgences</option>
+                            <option value="maintenance" {% if request.GET.category == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="period" class="form-label">Période</label>
+                        <select class="form-select" id="period" name="period">
+                            <option value="all" {% if request.GET.period == 'all' %}selected{% endif %}>Toutes les dates</option>
+                            <option value="today" {% if request.GET.period == 'today' %}selected{% endif %}>Aujourd'hui</option>
+                            <option value="week" {% if request.GET.period == 'week' %}selected{% endif %}>Cette semaine</option>
+                            <option value="month" {% if request.GET.period == 'month' %}selected{% endif %}>Ce mois</option>
+                            <option value="year" {% if request.GET.period == 'year' %}selected{% endif %}>Cette année</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Rechercher</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   placeholder="Rechercher dans les annonces..." 
+                                   value="{{ request.GET.search }}">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary text-center py-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_announcements }}</h5>
+                    <p class="card-text text-muted">Annonces au total</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info text-center py-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ active_announcements }}</h5>
+                    <p class="card-text text-muted">Annonces actives</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success text-center py-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ announcements_this_month }}</h5>
+                    <p class="card-text text-muted">Ce mois</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning text-center py-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ urgent_announcements }}</h5>
+                    <p class="card-text text-muted">Urgentes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des annonces -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">Toutes les annonces</h2>
+                </div>
+                
+                <div class="list-group list-group-flush">
+                    {% if announcements %}
+                        {% for announcement in announcements %}
+                        <div class="list-group-item p-4 {% if announcement.is_urgent %}border-start border-5 border-danger{% endif %}">
+                            <div class="d-flex align-items-start mb-2">
+                                <div class="me-3">
+                                    {% if announcement.category == 'info' %}
+                                    <span class="badge bg-primary rounded-pill p-2">
+                                        <i class="bi bi-info-circle fs-5"></i>
+                                    </span>
+                                    {% elif announcement.category == 'event' %}
+                                    <span class="badge bg-success rounded-pill p-2">
+                                        <i class="bi bi-calendar-event fs-5"></i>
+                                    </span>
+                                    {% elif announcement.category == 'academic' %}
+                                    <span class="badge bg-info rounded-pill p-2">
+                                        <i class="bi bi-journal-bookmark fs-5"></i>
+                                    </span>
+                                    {% elif announcement.category == 'emergency' %}
+                                    <span class="badge bg-danger rounded-pill p-2">
+                                        <i class="bi bi-exclamation-triangle fs-5"></i>
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary rounded-pill p-2">
+                                        <i class="bi bi-megaphone fs-5"></i>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h3 class="h5 mb-0">{{ announcement.title }}</h3>
+                                        <small class="text-muted">{{ announcement.created_at|date:"d M Y" }}</small>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <span class="badge bg-light text-dark me-1">
+                                                <i class="bi bi-person me-1"></i>{{ announcement.author.get_full_name }}
+                                            </span>
+                                            {% if announcement.is_urgent %}
+                                            <span class="badge bg-danger me-1">
+                                                <i class="bi bi-exclamation-triangle me-1"></i>Urgent
+                                            </span>
+                                            {% endif %}
+                                            {% if announcement.is_active %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Active
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-x-circle me-1"></i>Archivée
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            {% if announcement.attachment %}
+                                            <a href="{{ announcement.attachment.url }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-paperclip me-1"></i>Pièce jointe
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="announcement-content mb-3">
+                                        {{ announcement.content|safe|truncatewords:50 }}
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'announcement_detail' announcement.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-arrow-right-circle me-1"></i>Lire la suite
+                                        </a>
+                                        <small class="text-muted">
+                                            {% if announcement.views > 0 %}
+                                            <i class="bi bi-eye me-1"></i> {{ announcement.views }} vue{{ announcement.views|pluralize }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item text-center py-5">
+                            <i class="bi bi-megaphone fs-1 text-muted mb-3"></i>
+                            <h4 class="mb-2">Aucune annonce disponible</h4>
+                            <p class="text-muted mb-0">Aucune annonce n'a été publiée pour le moment</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if announcements.has_other_pages %}
+                <div class="card-footer bg-white">
+                    <nav aria-label="Navigation des annonces">
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if announcements.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Première">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ announcements.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Précédente">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in announcements.paginator.page_range %}
+                                {% if announcements.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > announcements.number|add:'-3' and num < announcements.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if announcements.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ announcements.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Suivante">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ announcements.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Dernière">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Barre latérale - Annonces importantes -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="sticky-top" style="top: 20px;">
+                <!-- Annonces urgentes -->
+                <div class="card border-danger shadow-sm mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="h5 mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Annonces Urgentes
+                        </h3>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% if urgent_announcements_list %}
+                            {% for announcement in urgent_announcements_list %}
+                            <a href="{% url 'announcement_detail' announcement.id %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-danger me-2">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </span>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>{{ announcement.title|truncatechars:30 }}</strong>
+                                            <small>{{ announcement.created_at|date:"d M" }}</small>
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ announcement.content|striptags|truncatewords:8 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item text-center py-3">
+                                <i class="bi bi-check-circle text-success fs-4 mb-2"></i>
+                                <p class="mb-0">Aucune annonce urgente</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Annonces récentes -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Récentes
+                        </h3>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% if recent_announcements %}
+                            {% for announcement in recent_announcements %}
+                            <a href="{% url 'announcement_detail' announcement.id %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    {% if announcement.category == 'info' %}
+                                    <span class="badge bg-primary me-2">
+                                        <i class="bi bi-info-circle"></i>
+                                    </span>
+                                    {% elif announcement.category == 'event' %}
+                                    <span class="badge bg-success me-2">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    {% elif announcement.category == 'academic' %}
+                                    <span class="badge bg-info me-2">
+                                        <i class="bi bi-journal-bookmark"></i>
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary me-2">
+                                        <i class="bi bi-megaphone"></i>
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>{{ announcement.title|truncatechars:30 }}</strong>
+                                            <small>{{ announcement.created_at|date:"d M" }}</small>
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ announcement.content|striptags|truncatewords:6 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item text-center py-3">
+                                <i class="bi bi-info-circle text-primary fs-4 mb-2"></i>
+                                <p class="mb-0">Aucune annonce récente</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Calendrier des événements -->
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="h5 mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>Calendrier des événements
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-container">
+                            {% for event in upcoming_events %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ event.title }}</strong>
+                                        <div class="text-muted small">{{ event.date|date:"d M Y" }}</div>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ event.category }}</span>
+                                </div>
+                                {% if not forloop.last %}<hr class="my-2">{% endif %}
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-3">
+                                <i class="bi bi-calendar-x text-muted fs-4 mb-2"></i>
+                                <p class="mb-0">Aucun événement à venir</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.announcement-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.border-danger {
+    border-left-color: #dc3545 !important;
+}
+
+.calendar-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Style personnalisé pour la barre de défilement */
+.calendar-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.calendar-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.calendar-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.calendar-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+{% endblock %}

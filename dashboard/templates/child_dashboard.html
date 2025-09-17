@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Espace Enfant - {{ child.name }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'dashboard/css/child_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="child-dashboard-container">
+    <!-- En-tête ludique -->
+    <header class="dashboard-header">
+        <div class="child-profile">
+            <img src="{{ child.avatar.url }}" alt="Photo de {{ child.name }}" class="child-avatar">
+            <div class="child-info">
+                <h1>Bonjour {{ child.name }} !</h1>
+                <div class="level-badge">
+                    <span class="badge-icon">🏆</span>
+                    Niveau {{ child.level }}
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <span>🌟</span>
+                <strong>{{ child.points }}</strong>
+                <small>Étoiles</small>
+            </div>
+            <div class="stat-card">
+                <span>✅</span>
+                <strong>{{ completed_activities }}</strong>
+                <small>Activités</small>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section d'activités -->
+    <section class="activities-section">
+        <h2><span class="icon">🎮</span> Mes Activités</h2>
+        <div class="activity-cards">
+            {% for activity in recent_activities %}
+            <div class="activity-card">
+                <div class="activity-badge" style="background-color: activity_category_color ">
+                    {{ activity.category.icon }}
+                </div>
+                <h3>{{ activity.title }}</h3>
+                <p>{{ activity.short_description }}</p>
+                <a href="{% url 'lms:interactive_activity' activity.id %}" class="btn-play">
+                    Jouer <span>▶</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Section jeux éducatifs -->
+    <section class="games-section">
+        <h2><span class="icon">🧩</span> Jeux Éducatifs</h2>
+        <div class="game-categories">
+            <div class="category-card math">
+                <h3>Mathématiques</h3>
+                <div class="games-list">
+                    {% for game in math_games %}
+                    <a href="{% url 'lms:game_detail' game.id %}" class="game-item">
+                        <span>🔢</span> {{ game.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="category-card language">
+                <h3>Langage</h3>
+                <div class="games-list">
+                    {% for game in language_games %}
+                    <a href="{% url 'lms:game_detail' game.id %}" class="game-item">
+                        <span>🔤</span> {{ game.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="category-card science">
+                <h3>Découverte</h3>
+                <div class="games-list">
+                    {% for game in science_games %}
+                    <a href="{% url 'lms:game_detail' game.id %}" class="game-item">
+                        <span>🔬</span> {{ game.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section récompenses -->
+    <section class="rewards-section">
+        <h2><span class="icon">🏆</span> Mes Récompenses</h2>
+        <div class="rewards-carousel">
+            {% for reward in unlocked_rewards %}
+            <div class="reward-card">
+                <div class="reward-badge">
+                    <span>{{ reward.badge }}</span>
+                </div>
+                <p>{{ reward.name }}</p>
+                <small>Débloqué le {{ reward.date|date:"d/m/Y" }}</small>
+            </div>
+            {% empty %}
+            <div class="no-rewards">
+                <p>Tu n'as pas encore de récompenses</p>
+                <p>Joue à des jeux pour en gagner !</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Section devoirs -->
+    {% if pending_assignments %}
+    <section class="assignments-section">
+        <h2><span class="icon">📝</span> Mes Devoirs</h2>
+        <div class="assignment-list">
+            {% for assignment in pending_assignments %}
+            <div class="assignment-item">
+                <div class="assignment-icon">
+                    {% if assignment.is_urgent %}⚠️{% else %}📅{% endif %}
+                </div>
+                <div class="assignment-info">
+                    <h3>{{ assignment.title }}</h3>
+                    <p>Pour le : {{ assignment.due_date|date:"d/m/Y" }}</p>
+                </div>
+                <a href="{% url 'lms:assignment_submit' assignment.id %}" class="btn-start">
+                    Commencer
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'dashboard/js/child_dashboard.js' %}"></script>
+{% endblock %}

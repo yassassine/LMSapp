@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord Parent - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- En-tête avec informations parent -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">
+                <i class="bi bi-house-door me-2 text-primary"></i>Tableau de Bord Parent
+            </h1>
+            <p class="text-muted mb-0">Bienvenue, {{ parent.get_full_name }}</p>
+        </div>
+        <div class="d-flex">
+            <div class="me-3">
+                <div class="card bg-light">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-people fs-4 text-primary me-2"></i>
+                            <div>
+                                <p class="mb-0 small">Enfants</p>
+                                <p class="mb-0 fw-bold">{{ children_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="me-3">
+                <a href="{% url 'notifications' %}" class="card bg-light text-decoration-none">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-bell fs-4 text-primary me-2"></i>
+                            <div>
+                                <p class="mb-0 small">Notifications</p>
+                                <p class="mb-0 fw-bold">{{ unread_notifications_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="{% url 'inbox' %}" class="card bg-light text-decoration-none">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-envelope fs-4 text-primary me-2"></i>
+                            <div>
+                                <p class="mb-0 small">Messages</p>
+                                <p class="mb-0 fw-bold">{{ unread_messages_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Section principale -->
+        <div class="col-lg-8">
+            <!-- Progrès des enfants -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">Progrès des Enfants</h2>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    id="childProgressDropdown" data-bs-toggle="dropdown">
+                                {% if selected_child %}{{ selected_child.get_full_name }}{% else %}Tous les enfants{% endif %}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="?child=all">Tous les enfants</a></li>
+                                {% for child in children %}
+                                <li><a class="dropdown-item" href="?child={{ child.id }}">{{ child.get_full_name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Compétences sociales -->
+                        <div class="col-md-6">
+                            <div class="card border-0 mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6 mb-3 text-primary">
+                                        <i class="bi bi-people me-1"></i>Compétences Sociales
+                                    </h3>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Coopération</span>
+                                            <span>85%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Partage</span>
+                                            <span>78%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 78%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Communication</span>
+                                            <span>92%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Compétences cognitives -->
+                        <div class="col-md-6">
+                            <div class="card border-0 mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6 mb-3 text-primary">
+                                        <i class="bi bi-lightbulb me-1"></i>Compétences Cognitives
+                                    </h3>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Résolution de problèmes</span>
+                                            <span>75%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Reconnaissance des formes</span>
+                                            <span>88%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Mémoire</span>
+                                            <span>80%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 80%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Développement physique -->
+                        <div class="col-md-6">
+                            <div class="card border-0 mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6 mb-3 text-primary">
+                                        <i class="bi bi-activity me-1"></i>Développement Physique
+                                    </h3>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Motricité fine</span>
+                                            <span>82%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 82%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Motricité globale</span>
+                                            <span>90%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Coordination</span>
+                                            <span>85%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Développement émotionnel -->
+                        <div class="col-md-6">
+                            <div class="card border-0">
+                                <div class="card-body">
+                                    <h3 class="h6 mb-3 text-primary">
+                                        <i class="bi bi-heart me-1"></i>Développement Émotionnel
+                                    </h3>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Reconnaissance des émotions</span>
+                                            <span>79%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 79%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Gestion des émotions</span>
+                                            <span>72%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 72%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Empathie</span>
+                                            <span>85%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'progress_tracking' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-graph-up me-1"></i>Voir les progrès détaillés
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activités récentes -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">Activités Récentes</h2>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    id="activityFilterDropdown" data-bs-toggle="dropdown">
+                                Toutes les activités
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Toutes les activités</a></li>
+                                <li><a class="dropdown-item" href="#">Créations artistiques</a></li>
+                                <li><a class="dropdown-item" href="#">Jeux éducatifs</a></li>
+                                <li><a class="dropdown-item" href="#">Activités physiques</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for activity in recent_activities %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                {% if activity.image %}
+                                <img src="{{ activity.image.url }}" class="card-img-top" alt="{{ activity.title }}" style="height: 150px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="bi bi-image text-muted fs-1"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h3 class="h6 card-title">{{ activity.title }}</h3>
+                                    <p class="card-text small text-muted">
+                                        {{ activity.description|truncatechars:100 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">{{ activity.category }}</span>
+                                        <small class="text-muted">{{ activity.date|date:"d M Y" }}</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 pt-0">
+                                    <a href="{% url 'activity_detail' activity.id %}" class="btn btn-sm btn-outline-primary w-100">
+                                        Voir les détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-activity fs-1 text-muted mb-3"></i>
+                            <h4 class="mb-2">Aucune activité récente</h4>
+                            <p class="text-muted">Aucune activité n'a été enregistrée pour le moment</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a href="{% url 'activities' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Voir toutes les activités
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barre latérale -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="sticky-top" style="top: 20px;">
+                <!-- Calendrier des événements -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-calendar-event me-2 text-primary"></i>Calendrier des Événements
+                        </h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for event in upcoming_events %}
+                            <a href="{% url 'event_detail' event.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded text-center p-2" style="width: 50px;">
+                                            <div class="fw-bold">{{ event.date|date:"d" }}</div>
+                                            <div class="small">{{ event.date|date:"M" }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-1">{{ event.title }}</h5>
+                                        <p class="mb-0 small text-muted">
+                                            <i class="bi bi-clock me-1"></i> {{ event.start_time|time }} - {{ event.end_time|time }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            {% empty %}
+                            <div class="list-group-item text-center py-4">
+                                <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
+                                <h4 class="h5">Aucun événement à venir</h4>
+                                <p class="text-muted">Aucun événement n'est prévu pour le moment</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white text-center">
+                        <a href="{% url 'events' %}" class="btn btn-outline-primary btn-sm">
+                            Voir le calendrier complet
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Derniers messages -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-chat-text me-2 text-primary"></i>Derniers Messages
+                        </h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for message in recent_messages %}
+                            <a href="{% url 'message_detail' message.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        {% if message.sender.photo %}
+                                        <img src="{{ message.sender.photo.url }}" class="rounded-circle" width="40" height="40" alt="{{ message.sender.get_full_name }}">
+                                        {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person text-white"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="mb-1">{{ message.sender.get_full_name }}</h5>
+                                            <small class="text-muted">{{ message.sent_at|timesince }}</small>
+                                        </div>
+                                        <p class="mb-0 small text-truncate">{{ message.subject }}</p>
+                                        {% if not message.is_read %}
+                                        <span class="badge bg-danger float-end">Nouveau</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                            {% empty %}
+                            <div class="list-group-item text-center py-4">
+                                <i class="bi bi-envelope fs-1 text-muted mb-3"></i>
+                                <h4 class="h5">Aucun message</h4>
+                                <p class="text-muted">Vous n'avez aucun message récent</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white text-center">
+                        <a href="{% url 'compose_message' %}" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="bi bi-pencil me-1"></i>Nouveau message
+                        </a>
+                        <a href="{% url 'inbox' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-inbox me-1"></i>Boîte de réception
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Rappels importants -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-bell me-2 text-primary"></i>Rappels Importants
+                        </h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for reminder in important_reminders %}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        {% if reminder.is_urgent %}
+                                        <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                                        {% else %}
+                                        <i class="bi bi-info-circle-fill text-primary fs-4"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-1">{{ reminder.title }}</h5>
+                                        <p class="mb-0 small">{{ reminder.description }}</p>
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i> {{ reminder.due_date|date:"d M Y" }}
+                                            </small>
+                                            {% if reminder.child %}
+                                            <span class="badge bg-light text-dark">
+                                                {{ reminder.child.get_full_name }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="list-group-item text-center py-4">
+                                <i class="bi bi-check-circle fs-1 text-muted mb-3"></i>
+                                <h4 class="h5">Aucun rappel</h4>
+                                <p class="text-muted">Vous n'avez aucun rappel important</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+.progress-bar {
+    background-color: #0d6efd;
+    border-radius: 10px;
+}
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.list-group-item {
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.sticky-top {
+    z-index: 1;
+}
+</style>
+{% endblock %}

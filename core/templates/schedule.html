@@ -1,0 +1,585 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Horaires & Calendrier - Garderie Scolaire{% endblock %}
+
+{% block content %}
+<!-- Section Hero -->
+<section class="schedule-hero bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3">Horaires & Calendrier</h1>
+                <p class="lead mb-4">Consultez nos horaires d'ouverture, les périodes de vacances et les événements à venir</p>
+                
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="badge bg-light text-dark p-2">
+                        <i class="fas fa-clock me-1 text-primary"></i> Lundi-Vendredi: 7h30-18h30
+                    </div>
+                    <div class="badge bg-light text-dark p-2">
+                        <i class="fas fa-clock me-1 text-primary"></i> Samedi: 9h00-12h00 (activités)
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#daily-schedule" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-list me-2"></i>Emploi du temps
+                    </a>
+                    <a href="#calendar" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-calendar-alt me-2"></i>Voir le calendrier
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card bg-white text-dark shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <h3 class="h4 mb-3">Prochains Événements</h3>
+                        <ul class="event-list list-unstyled">
+                            {% for event in upcoming_events %}
+                            <li class="mb-3 d-flex">
+                                <div class="event-date bg-primary text-white text-center me-3">
+                                    <div class="day fw-bold">{{ event.date|date:"d" }}</div>
+                                    <div class="month">{{ event.date|date:"M" }}</div>
+                                </div>
+                                <div>
+                                    <h4 class="h6 mb-0">{{ event.title }}</h4>
+                                    <p class="small mb-0">
+                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                        {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
+                                    </p>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="text-center py-3">
+                                <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                                <p class="mb-0">Aucun événement prévu</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'events_list' %}" class="btn btn-outline-primary w-100 mt-2">
+                            <i class="fas fa-plus me-1"></i>Voir tous les événements
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Horaires Quotidiens -->
+<section id="daily-schedule" class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-clock me-2 text-primary"></i>Emploi du temps quotidien</h2>
+                <p class="text-muted">Déroulement typique d'une journée à la garderie</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="schedule-timeline">
+                    {% for activity in daily_schedule %}
+                    <div class="timeline-item">
+                        <div class="timeline-time bg-primary text-white">
+                            {{ activity.time }}
+                        </div>
+                        <div class="timeline-content card shadow-sm">
+                            <div class="card-body">
+                                <h3 class="h5 mb-1">{{ activity.title }}</h3>
+                                <p class="mb-0 text-muted">{{ activity.description }}</p>
+                            </div>
+                            {% if activity.age_groups %}
+                            <div class="card-footer bg-light py-2">
+                                <span class="badge bg-info">{{ activity.age_groups }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-5">
+            <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h4 class="alert-heading">Flexibilité des horaires</h4>
+                    <p class="mb-0">
+                        Les horaires sont adaptables selon les besoins des parents. 
+                        <a href="{% url 'contact' %}" class="alert-link">Contactez-nous</a> 
+                        pour discuter d'horaires personnalisés.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Calendrier Mensuel -->
+<section id="calendar" class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-calendar-alt me-2 text-success"></i>Calendrier Mensuel</h2>
+                <p class="text-muted">Consultez notre planning mensuel avec les événements importants</p>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-10 mx-auto">
+                <div class="calendar-controls d-flex justify-content-between align-items-center mb-4">
+                    <button id="prev-month" class="btn btn-outline-primary">
+                        <i class="fas fa-chevron-left me-1"></i>Mois précédent
+                    </button>
+                    <h3 id="current-month" class="mb-0 text-center fw-bold"></h3>
+                    <button id="next-month" class="btn btn-outline-primary">
+                        Mois suivant <i class="fas fa-chevron-right ms-1"></i>
+                    </button>
+                </div>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-day-header">Lun</div>
+                        <div class="calendar-day-header">Mar</div>
+                        <div class="calendar-day-header">Mer</div>
+                        <div class="calendar-day-header">Jeu</div>
+                        <div class="calendar-day-header">Ven</div>
+                        <div class="calendar-day-header">Sam</div>
+                        <div class="calendar-day-header">Dim</div>
+                    </div>
+                    <div id="calendar-body" class="calendar-body">
+                        <!-- Le calendrier sera généré par JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calendar-legend mt-4">
+            <h4 class="h5 mb-3">Légende :</h4>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <span class="legend-color bg-primary me-2"></span>
+                    <span>Journée normale</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="legend-color bg-success me-2"></span>
+                    <span>Événement spécial</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="legend-color bg-warning me-2"></span>
+                    <span>Sortie éducative</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="legend-color bg-danger me-2"></span>
+                    <span>Fermeture exceptionnelle</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="legend-color bg-secondary me-2"></span>
+                    <span>Vacances scolaires</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Périodes de Fermeture -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-door-closed me-2 text-danger"></i>Périodes de Fermeture</h2>
+                <p class="text-muted">Dates importantes où la garderie sera fermée</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Période</th>
+                                        <th>Dates</th>
+                                        <th>Type</th>
+                                        <th>Réouverture</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for closure in closures %}
+                                    <tr>
+                                        <td>{{ closure.title }}</td>
+                                        <td>
+                                            {{ closure.start_date|date:"d/m/Y" }} 
+                                            <i class="fas fa-arrow-right mx-1 text-muted"></i> 
+                                            {{ closure.end_date|date:"d/m/Y" }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ closure.get_badge_color }}">
+                                                {{ closure.get_closure_type_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ closure.end_date|date:"d/m/Y" }} à 7h30</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            <i class="fas fa-calendar-check fa-2x text-success mb-3"></i>
+                                            <h4>Aucune fermeture prévue</h4>
+                                            <p class="text-muted">La garderie reste ouverte toute l'année</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-4">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-heading">Garderie périscolaire</h4>
+                            <p class="mb-0">
+                                Pendant les vacances scolaires, nous proposons un programme spécial d'activités.
+                                <a href="{% url 'activities' %}" class="alert-link">Consultez notre programme vacances</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Téléchargements -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3"><i class="fas fa-file-download me-2 text-info"></i>Documents Utiles</h2>
+                <p class="text-muted">Téléchargez nos plannings au format PDF</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card download-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-info text-white mb-4 mx-auto">
+                            <i class="fas fa-calendar-day fa-2x"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Emploi du temps journalier</h3>
+                        <p class="text-muted small mb-4">Détail des activités quotidiennes par groupe d'âge</p>
+                        <a href="{% static 'documents/daily-schedule.pdf' %}" class="btn btn-outline-info" download>
+                            <i class="fas fa-download me-1"></i>Télécharger (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card download-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-success text-white mb-4 mx-auto">
+                            <i class="fas fa-calendar-alt fa-2x"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Calendrier mensuel</h3>
+                        <p class="text-muted small mb-4">Planning complet du mois avec événements spéciaux</p>
+                        <a href="{% static 'documents/monthly-calendar.pdf' %}" class="btn btn-outline-success" download>
+                            <i class="fas fa-download me-1"></i>Télécharger (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card download-card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle bg-primary text-white mb-4 mx-auto">
+                            <i class="fas fa-calendar-times fa-2x"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Calendrier annuel</h3>
+                        <p class="text-muted small mb-4">Dates importantes et périodes de fermeture pour l'année</p>
+                        <a href="{% static 'documents/annual-calendar.pdf' %}" class="btn btn-outline-primary" download>
+                            <i class="fas fa-download me-1"></i>Télécharger (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .schedule-hero {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .event-list .event-date {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .event-date .day {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+    
+    .event-date .month {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .schedule-timeline {
+        position: relative;
+        padding-left: 100px;
+    }
+    
+    .schedule-timeline::before {
+        content: '';
+        position: absolute;
+        left: 50px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #0d6efd;
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-time {
+        position: absolute;
+        left: -100px;
+        top: 0;
+        width: 80px;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .calendar-container {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .calendar-header {
+        display: flex;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .calendar-day-header {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        font-weight: bold;
+        color: #6c757d;
+    }
+    
+    .calendar-body {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .calendar-day {
+        flex: 0 0 calc(100% / 7);
+        min-height: 120px;
+        padding: 0.5rem;
+        border-right: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        position: relative;
+        background-color: white;
+    }
+    
+    .calendar-day:nth-child(7n) {
+        border-right: none;
+    }
+    
+    .calendar-day-header, .calendar-day {
+        width: calc(100% / 7);
+    }
+    
+    .calendar-day-number {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+    
+    .calendar-event {
+        font-size: 0.75rem;
+        padding: 0.1rem 0.25rem;
+        margin-bottom: 0.1rem;
+        border-radius: 0.25rem;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .legend-color {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+    
+    .download-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
+    
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @media (max-width: 768px) {
+        .schedule-timeline {
+            padding-left: 70px;
+        }
+        
+        .schedule-timeline::before {
+            left: 35px;
+        }
+        
+        .timeline-time {
+            left: -70px;
+            width: 60px;
+            font-size: 0.9rem;
+        }
+        
+        .calendar-day {
+            min-height: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation du calendrier
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    
+    const monthNames = [
+        "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+        "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+    ];
+    
+    // Événements statiques pour la démo (à remplacer par des données réelles)
+    const events = [
+        { date: new Date(currentYear, currentMonth, 5), title: "Sortie au musée", type: "warning" },
+        { date: new Date(currentYear, currentMonth, 12), title: "Réunion parents", type: "success" },
+        { date: new Date(currentYear, currentMonth, 15), title: "Spectacle de fin d'année", type: "success" },
+        { date: new Date(currentYear, currentMonth, 20), title: "Fermeture exceptionnelle", type: "danger" },
+        { date: new Date(currentYear, currentMonth, 23), title: "Atelier cuisine", type: "success" },
+        { date: new Date(currentYear, currentMonth, 28), title: "Vacances scolaires", type: "secondary" }
+    ];
+    
+    // Générer le calendrier
+    function generateCalendar(month, year) {
+        document.getElementById('current-month').textContent = `${monthNames[month]} ${year}`;
+        
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = '';
+        
+        // Premier jour du mois
+        const firstDay = new Date(year, month, 1);
+        // Dernier jour du mois
+        const lastDay = new Date(year, month + 1, 0);
+        // Jour de la semaine du premier jour (0 = dimanche, 1 = lundi, etc.)
+        const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        
+        // Créer les jours vides au début
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day empty';
+            calendarBody.appendChild(emptyDay);
+        }
+        
+        // Créer les jours du mois
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'calendar-day-number';
+            dayNumber.textContent = day;
+            dayElement.appendChild(dayNumber);
+            
+            // Ajouter les événements pour ce jour
+            const dayEvents = events.filter(event => 
+                event.date.getDate() === day && 
+                event.date.getMonth() === month && 
+                event.date.getFullYear() === year
+            );
+            
+            dayEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = `calendar-event bg-${event.type}`;
+                eventElement.textContent = event.title;
+                dayElement.appendChild(eventElement);
+            });
+            
+            // Mettre en évidence aujourd'hui
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayElement.classList.add('today');
+                dayNumber.innerHTML = `<span class="badge bg-primary">${day}</span>`;
+            }
+            
+            calendarBody.appendChild(dayElement);
+        }
+    }
+    
+    // Initialisation
+    generateCalendar(currentMonth, currentYear);
+    
+    // Navigation entre les mois
+    document.getElementById('prev-month').addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar(currentMonth, currentYear);
+    });
+    
+    document.getElementById('next-month').addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generateCalendar(currentMonth, currentYear);
+    });
+});
+</script>
+{% endblock %}
